@@ -4,6 +4,7 @@ import { factorCatalog } from "@disha/engine";
 import { compare } from "./compare.js";
 import { PORT, isGeminiConfigured } from "./config.js";
 import { parseDecision } from "./gemini/parseDecision.js";
+import { compareFromScreenshot } from "./screenshotFlow.js";
 
 const app = express();
 
@@ -46,7 +47,31 @@ app.post("/compare", async (req, res) => {
   }
   try {
     const parsed = await parseDecision(text);
-    res.json(compare(parsed));
+    res.json({ ...compare(parsed), source: "text" });
+  } catch (err) {
+    handleError(res, err);
+  }
+});
+
+// Phase 4 — Door C. Screenshot in, same ranked comparison out. The read option
+// becomes the user's default; the engine supplies the greener alternatives.
+app.post("/compare-image", async (req, res) => {
+  const imageBase64 =
+    typeof req.body?.imageBase64 === "string" ? req.body.imageBase64 : "";
+  const mimeType =
+    typeof req.body?.mimeType === "string" ? req.body.mimeType : "";
+  if (!imageBase64) {
+    return res
+      .status(400)
+      .json({ error: "Provide a base64 'imageBase64' field." });
+  }
+  if (!/^image\/(png|jpe?g|webp|heic|heif)$/i.test(mimeType)) {
+    return res.status(400).json({
+      error: "Provide a valid image 'mimeType' (png, jpeg, webp, heic).",
+    });
+  }
+  try {
+    res.json(await compareFromScreenshot(imageBase64, mimeType));
   } catch (err) {
     handleError(res, err);
   }

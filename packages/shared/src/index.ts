@@ -65,6 +65,15 @@ export interface RankedOption extends Candidate {
   kgVsDefault?: number;
 }
 
+/** What the screenshot door read from the image (route, price, mode only). */
+export interface ScreenshotExtraction {
+  origin?: string;
+  destination?: string;
+  mode: string;
+  priceINR?: number;
+  summary: string;
+}
+
 /** The /compare response the result card renders. */
 export interface CompareResponse {
   intent: Intent;
@@ -74,4 +83,8 @@ export interface CompareResponse {
   default?: RankedOption;
   /** One plain-language nudge line for the card. */
   nudge: string;
+  /** Which front door produced this comparison. */
+  source?: "text" | "voice" | "screenshot";
+  /** Present for the screenshot door — what was read from the image. */
+  extraction?: ScreenshotExtraction;
 }
