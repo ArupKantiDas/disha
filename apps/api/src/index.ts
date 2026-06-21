@@ -5,7 +5,7 @@ import { compare } from "./compare.js";
 import { PORT, isGeminiConfigured } from "./config.js";
 import { parseDecision } from "./gemini/parseDecision.js";
 import { compareFromScreenshot } from "./screenshotFlow.js";
-import { commitDecision, getLedger } from "./ledger.js";
+import { commitDecision, getLedger, getRecentDecisions, getStats } from "./ledger.js";
 
 const app = express();
 
@@ -82,13 +82,25 @@ app.post("/compare-image", async (req, res) => {
 // only grows. clientId is an anonymous id the browser keeps in localStorage.
 const CLIENT_ID_RE = /^[A-Za-z0-9_-]{8,128}$/;
 
+app.get("/stats", async (_req, res) => {
+  try {
+    res.json(await getStats());
+  } catch (err) {
+    handleError(res, err);
+  }
+});
+
 app.get("/ledger/:clientId", async (req, res) => {
   const clientId = req.params.clientId;
   if (!CLIENT_ID_RE.test(clientId)) {
     return res.status(400).json({ error: "Invalid clientId." });
   }
   try {
-    res.json(await getLedger(clientId));
+    const [state, recent] = await Promise.all([
+      getLedger(clientId),
+      getRecentDecisions(clientId),
+    ]);
+    res.json({ ...state, recent });
   } catch (err) {
     handleError(res, err);
   }
