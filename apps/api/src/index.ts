@@ -6,6 +6,7 @@ import { PORT, isGeminiConfigured } from "./config.js";
 import { parseDecision } from "./gemini/parseDecision.js";
 import { compareFromScreenshot } from "./screenshotFlow.js";
 import { commitDecision, getLedger, getRecentDecisions, getStats } from "./ledger.js";
+import { verifyIdToken } from "./firebaseAdmin.js";
 
 const app = express();
 
@@ -81,6 +82,8 @@ app.post("/compare-image", async (req, res) => {
 // Phase 6 — the carbon-avoided ledger. A device-scoped lifetime total that
 // only grows. clientId is an anonymous id the browser keeps in localStorage.
 const CLIENT_ID_RE = /^[A-Za-z0-9_-]{8,128}$/;
+// Firebase UIDs are alphanumeric, typically 28 chars
+const FIREBASE_UID_RE = /^[A-Za-z0-9]{20,128}$/;
 
 app.get("/stats", async (_req, res) => {
   try {
@@ -92,7 +95,7 @@ app.get("/stats", async (_req, res) => {
 
 app.get("/ledger/:clientId", async (req, res) => {
   const clientId = req.params.clientId;
-  if (!CLIENT_ID_RE.test(clientId)) {
+  if (!CLIENT_ID_RE.test(clientId) && !FIREBASE_UID_RE.test(clientId)) {
     return res.status(400).json({ error: "Invalid clientId." });
   }
   try {
@@ -107,17 +110,32 @@ app.get("/ledger/:clientId", async (req, res) => {
 });
 
 app.post("/ledger/commit", async (req, res) => {
-  const clientId =
-    typeof req.body?.clientId === "string" ? req.body.clientId : "";
   const kgAvoided = Number(req.body?.kgAvoided);
-  if (!CLIENT_ID_RE.test(clientId)) {
-    return res.status(400).json({ error: "Invalid or missing clientId." });
-  }
   if (!Number.isFinite(kgAvoided)) {
     return res.status(400).json({ error: "kgAvoided must be a number." });
   }
+
+  let ledgerKey: string;
+
+  const authHeader = req.headers.authorization;
+  if (authHeader?.startsWith("Bearer ")) {
+    const token = authHeader.slice(7);
+    const decoded = await verifyIdToken(token);
+    if (!decoded) {
+      return res.status(401).json({ error: "Invalid or expired ID token." });
+    }
+    ledgerKey = decoded.uid;
+  } else {
+    const clientId =
+      typeof req.body?.clientId === "string" ? req.body.clientId : "";
+    if (!CLIENT_ID_RE.test(clientId)) {
+      return res.status(400).json({ error: "Invalid or missing clientId." });
+    }
+    ledgerKey = clientId;
+  }
+
   try {
-    const state = await commitDecision(clientId, kgAvoided, {
+    const state = await commitDecision(ledgerKey, kgAvoided, {
       label: req.body?.label,
       factorKey: req.body?.factorKey,
       summary: req.body?.summary,

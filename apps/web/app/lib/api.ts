@@ -1,4 +1,4 @@
-import type { CompareResponse, FactorRow, LedgerState } from "./types";
+import type { CompareResponse, FactorRow, LedgerState, StatsResult } from "./types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 
@@ -47,14 +47,24 @@ export async function commitDecision(payload: {
   defaultLabel?: string;
   summary?: string;
   factorKey?: string;
+  idToken?: string;
 }): Promise<LedgerState> {
+  const { idToken, ...body } = payload;
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  if (idToken) headers["Authorization"] = `Bearer ${idToken}`;
   const res = await fetch(`${API_URL}/ledger/commit`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
+    headers,
+    body: JSON.stringify(body),
   });
   if (!res.ok) return handleError(res);
   return res.json() as Promise<LedgerState>;
+}
+
+export async function getStats(): Promise<StatsResult> {
+  const res = await fetch(`${API_URL}/stats`);
+  if (!res.ok) return handleError(res);
+  return res.json() as Promise<StatsResult>;
 }
 
 export async function getFactors(): Promise<FactorRow[]> {

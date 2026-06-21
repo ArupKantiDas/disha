@@ -48,9 +48,29 @@ export interface CompareResponse {
   extraction?: ScreenshotExtraction;
 }
 
+export interface RecentDecision {
+  label: string;
+  kgAvoided: number;
+  at: string;
+}
+
 export interface LedgerState {
   kgAvoidedTotal: number;
   decisionCount: number;
+  recent?: RecentDecision[];
+}
+
+export interface DailyTrend {
+  date: string;
+  kg: number;
+}
+
+export interface StatsResult {
+  totalKgAvoided: number;
+  totalDecisions: number;
+  totalUsers: number;
+  avgPerUser: number;
+  dailyTrend: DailyTrend[];
 }
 
 export interface FactorRow {

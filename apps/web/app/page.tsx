@@ -5,11 +5,14 @@ import DecisionInput from "./components/DecisionInput";
 import ResultCard from "./components/ResultCard";
 import SeedChips from "./components/SeedChips";
 import ScreenshotUpload from "./components/ScreenshotUpload";
-import AvoidedCounter from "./components/AvoidedCounter";
 import HowWeCalculate from "./components/HowWeCalculate";
-import { compare, compareImage, getLedger, commitDecision } from "./lib/api";
+import CommunityStats from "./components/CommunityStats";
+import AuthButton from "./components/AuthButton";
+import Dashboard from "./components/Dashboard";
+import { compare, compareImage, getLedger, commitDecision, getStats } from "./lib/api";
 import { getClientId } from "./lib/clientId";
-import type { CompareResponse, LedgerState, RankedOption } from "./lib/types";
+import { useAuth } from "./lib/auth";
+import type { CompareResponse, LedgerState, RankedOption, StatsResult } from "./lib/types";
 
 type PageState =
   | { kind: "idle" }
@@ -18,20 +21,27 @@ type PageState =
   | { kind: "result"; data: CompareResponse };
 
 export default function Home() {
+  const authState = useAuth();
+  const { user, loading: authLoading } = authState;
+
   const [state, setState] = useState<PageState>({ kind: "idle" });
   const [ledger, setLedger] = useState<LedgerState>({ kgAvoidedTotal: 0, decisionCount: 0 });
+  const [stats, setStats] = useState<StatsResult | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const clientIdRef = useRef<string>("");
 
+  // Fetch stats on mount
   useEffect(() => {
-    const id = getClientId();
-    clientIdRef.current = id;
-    if (!id) return;
-    getLedger(id)
-      .then(setLedger)
-      .catch(() => {/* keep zeros */});
+    getStats().then(setStats).catch(() => {});
   }, []);
+
+  // Fetch ledger whenever auth resolves or changes
+  useEffect(() => {
+    if (authLoading) return;
+    const id = user ? user.uid : getClientId();
+    if (!id) return;
+    getLedger(id).then(setLedger).catch(() => {});
+  }, [user, authLoading]);
 
   function showToast(msg: string) {
     if (toastTimer.current) clearTimeout(toastTimer.current);
@@ -48,9 +58,7 @@ export default function Home() {
       setState({
         kind: "error",
         message:
-          err instanceof Error
-            ? err.message
-            : "Something went wrong. Please try again.",
+          err instanceof Error ? err.message : "Something went wrong. Please try again.",
       });
     }
   }
@@ -64,18 +72,25 @@ export default function Home() {
       setState({
         kind: "error",
         message:
-          err instanceof Error
-            ? err.message
-            : "Something went wrong. Please try again.",
+          err instanceof Error ? err.message : "Something went wrong. Please try again.",
       });
     }
   }
 
   async function handleTake(option: RankedOption) {
-    const clientId = clientIdRef.current;
-    if (!clientId) return;
     const result = state.kind === "result" ? state.data : null;
     try {
+      let idToken: string | undefined;
+      let clientId: string;
+
+      if (user) {
+        idToken = await user.getIdToken();
+        clientId = user.uid;
+      } else {
+        clientId = getClientId();
+        if (!clientId) return;
+      }
+
       const updated = await commitDecision({
         clientId,
         kgAvoided: option.kgVsDefault ?? 0,
@@ -83,8 +98,11 @@ export default function Home() {
         defaultLabel: result?.default?.label,
         summary: result?.intent.summary,
         factorKey: option.factorKey,
+        idToken,
       });
       setLedger(updated);
+      // Refresh community stats after commit
+      getStats().then(setStats).catch(() => {});
       showToast("Logged ✓");
     } catch {
       showToast("Could not log — try again.");
@@ -93,24 +111,35 @@ export default function Home() {
 
   return (
     <main className="mx-auto max-w-md px-4 py-10">
-      <header className="mb-6 space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight text-coal">
-          Disha <span className="text-leaf">·</span>
-        </h1>
-        <p className="text-sm leading-relaxed text-slate-600">
-          Tell us a trip or a purchase. We rank your real options across{" "}
-          <span className="font-semibold text-coal">carbon</span>,{" "}
-          <span className="font-semibold text-coal">cost</span>, and{" "}
-          <span className="font-semibold text-coal">time</span> — before you
-          spend a rupee.
-        </p>
+      <header className="mb-6 flex items-start justify-between gap-4">
+        <div className="space-y-1.5 flex-1">
+          <h1 className="text-3xl font-bold tracking-tight text-coal">
+            Disha <span className="text-leaf">·</span>
+          </h1>
+          <p className="text-sm leading-relaxed text-slate-600">
+            Tell us a trip or a purchase. We rank your real options across{" "}
+            <span className="font-semibold text-coal">carbon</span>,{" "}
+            <span className="font-semibold text-coal">cost</span>, and{" "}
+            <span className="font-semibold text-coal">time</span> — before you spend a rupee.
+          </p>
+        </div>
+        {!authLoading && <AuthButton auth={authState} />}
       </header>
 
+      {/* Signed-in personal dashboard */}
+      {!authLoading && user && (
+        <div className="mb-6">
+          <Dashboard
+            ledger={ledger}
+            stats={stats}
+            displayName={user.displayName}
+          />
+        </div>
+      )}
+
+      {/* Community stats — visible to all on landing */}
       <div className="mb-6">
-        <AvoidedCounter
-          kgAvoidedTotal={ledger.kgAvoidedTotal}
-          decisionCount={ledger.decisionCount}
-        />
+        <CommunityStats />
       </div>
 
       <DecisionInput
@@ -136,6 +165,20 @@ export default function Home() {
           <div className="space-y-3">
             <p className="text-sm text-slate-500">Not sure where to start? Try one:</p>
             <SeedChips onPick={handleSubmit} disabled={false} />
+            {!authLoading && !user && (
+              <div className="mt-4 rounded-2xl border border-leaf/20 bg-leaf/5 px-4 py-3 flex items-center justify-between gap-3">
+                <p className="text-sm text-slate-600">
+                  Sign in to track your personal impact across devices.
+                </p>
+                <button
+                  onClick={authState.signInWithGoogle}
+                  aria-label="Sign in with Google"
+                  className="shrink-0 rounded-full bg-leaf px-3 py-1.5 text-xs font-semibold text-white hover:bg-leafdark transition-colors"
+                >
+                  Sign in
+                </button>
+              </div>
+            )}
           </div>
         )}
 
