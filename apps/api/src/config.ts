@@ -3,6 +3,15 @@ import dotenv from "dotenv";
 dotenv.config();
 
 export const PORT = Number(process.env.PORT) || 8080;
+
+const DEFAULT_ALLOWED_ORIGINS = [
+  "https://web-three-lilac-10.vercel.app",
+  "http://localhost:3000",
+];
+
+export const ALLOWED_ORIGINS: string[] = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(",").map((o) => o.trim()).filter(Boolean)
+  : DEFAULT_ALLOWED_ORIGINS;
 export const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
 
 /**

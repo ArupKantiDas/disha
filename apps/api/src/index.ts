@@ -1,8 +1,10 @@
 import cors from "cors";
 import express from "express";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
 import { factorCatalog } from "@disha/engine";
 import { compare } from "./compare.js";
-import { PORT, isGeminiConfigured } from "./config.js";
+import { PORT, isGeminiConfigured, ALLOWED_ORIGINS } from "./config.js";
 import { parseDecision } from "./gemini/parseDecision.js";
 import { resolveDynamicFactors } from "./resolveDynamic.js";
 import { compareFromScreenshot } from "./screenshotFlow.js";
@@ -11,8 +13,42 @@ import { verifyIdToken } from "./firebaseAdmin.js";
 
 const app = express();
 
-app.use(cors());
-app.use(express.json({ limit: "10mb" }));
+// Cloud Run sits behind Google's load balancer; trust one hop for correct client IP.
+app.set("trust proxy", 1);
+
+app.use(helmet());
+
+app.use(
+  cors({
+    origin(origin, callback) {
+      // Allow requests with no Origin header (curl, health checks, server-to-server).
+      if (!origin) return callback(null, true);
+      if (ALLOWED_ORIGINS.includes(origin)) return callback(null, origin);
+      callback(new Error(`CORS: origin ${origin} not allowed`));
+    },
+    credentials: true,
+  }),
+);
+
+// Global limiter — covers all routes not individually limited below.
+const globalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 200,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+app.use(globalLimiter);
+
+// Tighter limiter for Gemini-backed endpoints that cost money and time.
+const geminiLimiter = rateLimit({
+  windowMs: 5 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many requests, please slow down." },
+});
+
+app.use(express.json({ limit: "1mb" }));
 
 app.get("/health", (_req, res) => {
   res.json({
@@ -29,7 +65,7 @@ app.get("/factors", (_req, res) => {
 });
 
 // Phase 2 — interpret only. Free text in, structured intent + candidates out.
-app.post("/parse", async (req, res) => {
+app.post("/parse", geminiLimiter, async (req, res) => {
   const text = typeof req.body?.text === "string" ? req.body.text : "";
   if (!text.trim()) {
     return res.status(400).json({ error: "Provide a non-empty 'text' field." });
@@ -43,7 +79,7 @@ app.post("/parse", async (req, res) => {
 });
 
 // Phase 3 — the core. Text -> parse -> dynamic resolution -> engine -> ranked comparison.
-app.post("/compare", async (req, res) => {
+app.post("/compare", geminiLimiter, async (req, res) => {
   const text = typeof req.body?.text === "string" ? req.body.text : "";
   if (!text.trim()) {
     return res.status(400).json({ error: "Provide a non-empty 'text' field." });
@@ -59,7 +95,7 @@ app.post("/compare", async (req, res) => {
 
 // Phase 4 — Door C. Screenshot in, same ranked comparison out. The read option
 // becomes the user's default; the engine supplies the greener alternatives.
-app.post("/compare-image", async (req, res) => {
+app.post("/compare-image", geminiLimiter, express.json({ limit: "10mb" }), async (req, res) => {
   const imageBase64 =
     typeof req.body?.imageBase64 === "string" ? req.body.imageBase64 : "";
   const mimeType =
