@@ -31,9 +31,19 @@ Hard rules:
     - If the user states or implies a mode (or a screenshot shows one), use that.
     - Otherwise infer the habitual, convenient choice a typical person in India would make for THIS exact decision: usually the faster/easier or higher-spend option — flight for a long intercity work trip, car or cab for a short city-to-city hop, AC over cooler in summer, buying new for an upgrade urge.
     - Do NOT default to the greenest option unless the user clearly already prefers it. The default anchors how much carbon they avoid, so it must reflect real habit, not the best case and not the worst case.
-- summary: one concise line restating the decision.
+- summary: one concise line restating the decision in the user's own framing (e.g. "Choosing which car to buy", not "intercity travel").
 
-Trip guidance: for an intercity trip, include the sensible subset of flight, train (AC), intercity bus, and petrol car. Add two-wheeler or auto only for short city hops where they make sense.
+RELEVANCE — the most important rule. Every alternative must serve the SAME underlying need at a SIMILAR segment, budget and aspiration level, just lower-carbon. Never drop the user into a different lifestyle or a much cheaper class. A person buying a premium car will not take a bus; offer them a greener premium car.
+
+Distinguish the two cases:
+- A TRIP (getting from A to B) is mode-agnostic. Comparing flight, train (AC), intercity bus, and petrol car is fair because each accomplishes the same journey. Use distanceKm = the real route distance. (Add two-wheeler/auto only for short city hops.)
+- A PURCHASE of a specific product is segment-bound. Compare it ONLY with greener products a buyer of THAT item would realistically cross-shop, plus the option to keep or buy used. NEVER offer public transport or a budget product against a premium purchase.
+
+Vehicle PURCHASE decisions (e.g. "buy a BMW M3"):
+- The default is the stated car. If it is a premium/performance/large petrol car, map it to transport.car_petrol_large; an average petrol car to transport.car_petrol.
+- Offer realistic greener options IN THE SAME CLASS: an electric car in that class -> transport.car_ev with a descriptive label like "Electric performance car (e.g. BMW i4 / Tesla Model 3 Performance)"; and "Keep my current car" -> the same petrol factor with distanceKm 0.
+- Do NOT offer train, bus, auto, a two-wheeler, or a budget hatchback (e.g. an Alto) as alternatives to a premium car.
+- Compare the DRIVING footprint over a representative year: set distanceKm = 12000 for every vehicle candidate (like-for-like), set costINR to the rough purchase price, and omit durationHours (not meaningful for a purchase). Make labels descriptive and segment-appropriate.
 
 Output ONLY JSON conforming to the provided schema. No prose, no markdown.`;
 

@@ -59,6 +59,15 @@
       "source": "Our World in Data: average petrol car approx 170 g CO2 per km",
       "verify": true
     },
+    "car_petrol_large": {
+      "label": "Petrol car, large / performance (SUV, luxury, sports)",
+      "factor": 0.28,
+      "unit": "kg_co2e_per_vehicle_km",
+      "occupancy_default": 1.5,
+      "note": "Large, luxury and performance petrol cars emit roughly 0.25-0.30 kg/km, well above the ~0.17 average. Use this for premium/performance car purchases (e.g. a BMW M3) so the comparison is honest rather than understated.",
+      "source": "Our World in Data / DEFRA large petrol car approx 0.27-0.30 kg CO2 per km",
+      "verify": true
+    },
     "car_ev": {
       "label": "Electric car (India grid charged)",
       "computed": "energy_kwh_per_km * grid.electricity_kwh.factor",
