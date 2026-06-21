@@ -3,7 +3,9 @@
 import { useState } from "react";
 import DecisionInput from "./components/DecisionInput";
 import ResultCard from "./components/ResultCard";
-import { compare } from "./lib/api";
+import SeedChips from "./components/SeedChips";
+import ScreenshotUpload from "./components/ScreenshotUpload";
+import { compare, compareImage } from "./lib/api";
 import type { CompareResponse } from "./lib/types";
 
 type PageState =
@@ -19,6 +21,22 @@ export default function Home() {
     setState({ kind: "loading" });
     try {
       const data = await compare(text);
+      setState({ kind: "result", data });
+    } catch (err) {
+      setState({
+        kind: "error",
+        message:
+          err instanceof Error
+            ? err.message
+            : "Something went wrong. Please try again.",
+      });
+    }
+  }
+
+  async function handleImage(file: File) {
+    setState({ kind: "loading" });
+    try {
+      const data = await compareImage(file);
       setState({ kind: "result", data });
     } catch (err) {
       setState({
@@ -51,7 +69,27 @@ export default function Home() {
         isLoading={state.kind === "loading"}
       />
 
+      <div className="mt-3 flex items-center gap-3">
+        <div className="h-px flex-1 bg-slate-100" />
+        <span className="text-xs text-slate-400">or</span>
+        <div className="h-px flex-1 bg-slate-100" />
+      </div>
+
+      <div className="mt-3 flex justify-center">
+        <ScreenshotUpload
+          onUpload={handleImage}
+          disabled={state.kind === "loading"}
+        />
+      </div>
+
       <div className="mt-8">
+        {state.kind === "idle" && (
+          <div className="space-y-3">
+            <p className="text-sm text-slate-500">Not sure where to start? Try one:</p>
+            <SeedChips onPick={handleSubmit} disabled={false} />
+          </div>
+        )}
+
         {state.kind === "loading" && (
           <div className="flex flex-col items-center gap-3 py-12">
             <span className="h-8 w-8 animate-spin rounded-full border-4 border-leaf border-t-transparent" />
@@ -66,7 +104,19 @@ export default function Home() {
           </div>
         )}
 
-        {state.kind === "result" && <ResultCard data={state.data} />}
+        {state.kind === "result" && (
+          <>
+            {state.data.source === "screenshot" && state.data.extraction && (
+              <div className="mb-4 rounded-xl bg-slate-100 px-4 py-3 text-sm text-slate-700">
+                <span>📷 From your screenshot: {state.data.extraction.summary}</span>
+                {state.data.extraction.priceINR !== undefined && (
+                  <span> · ₹{state.data.extraction.priceINR.toLocaleString("en-IN")}</span>
+                )}
+              </div>
+            )}
+            <ResultCard data={state.data} />
+          </>
+        )}
       </div>
 
       <footer className="mt-12 border-t border-slate-100 pt-6 text-xs text-slate-400">

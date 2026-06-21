@@ -30,10 +30,20 @@ export interface RankedOption {
   kgVsDefault?: number;
 }
 
+export interface ScreenshotExtraction {
+  origin?: string;
+  destination?: string;
+  mode: string;
+  priceINR?: number;
+  summary: string;
+}
+
 export interface CompareResponse {
   intent: Intent;
   options: RankedOption[];
   recommended: RankedOption;
   default?: RankedOption;
   nudge: string;
+  source?: "text" | "voice" | "screenshot";
+  extraction?: ScreenshotExtraction;
 }
