@@ -29,7 +29,7 @@ export default function Dashboard({ ledger, stats, displayName }: Props) {
         </div>
         <div className="text-right">
           <p className="text-2xl font-bold text-coal">{Math.round(yourTotal)} kg</p>
-          <p className="text-xs text-leaf font-medium">CO₂ avoided</p>
+          <p className="text-xs text-leafdark font-medium">CO₂ avoided</p>
           <p className="text-xs text-slate-400">{ledger.decisionCount} decision{ledger.decisionCount === 1 ? "" : "s"}</p>
         </div>
       </div>
@@ -45,6 +45,11 @@ export default function Dashboard({ ledger, stats, displayName }: Props) {
               </div>
               <div className="h-2 rounded-full bg-slate-100 overflow-hidden">
                 <div
+                  role="progressbar"
+                  aria-label="Your CO2 avoided"
+                  aria-valuenow={Math.round(yourTotal)}
+                  aria-valuemin={0}
+                  aria-valuemax={Math.round(maxVal)}
                   className="h-full rounded-full bg-leaf transition-all duration-500"
                   style={{ width: `${yourPct}%` }}
                 />
@@ -57,6 +62,11 @@ export default function Dashboard({ ledger, stats, displayName }: Props) {
               </div>
               <div className="h-2 rounded-full bg-slate-100 overflow-hidden">
                 <div
+                  role="progressbar"
+                  aria-label="Community average CO2 avoided"
+                  aria-valuenow={Math.round(avg)}
+                  aria-valuemin={0}
+                  aria-valuemax={Math.round(maxVal)}
                   className="h-full rounded-full bg-slate-300 transition-all duration-500"
                   style={{ width: `${avgPct}%` }}
                 />

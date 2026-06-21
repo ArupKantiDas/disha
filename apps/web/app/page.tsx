@@ -173,7 +173,7 @@ export default function Home() {
                 <button
                   onClick={authState.signInWithGoogle}
                   aria-label="Sign in with Google"
-                  className="shrink-0 rounded-full bg-leaf px-3 py-1.5 text-xs font-semibold text-white hover:bg-leafdark transition-colors"
+                  className="shrink-0 rounded-full bg-leafdark px-3 py-1.5 text-xs font-semibold text-white hover:bg-leaf transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-leaf focus-visible:ring-offset-2"
                 >
                   Sign in
                 </button>
@@ -183,9 +183,9 @@ export default function Home() {
         )}
 
         {state.kind === "loading" && (
-          <div className="flex flex-col items-center gap-3 py-12">
-            <span className="h-8 w-8 animate-spin rounded-full border-4 border-leaf border-t-transparent" />
-            <p className="text-sm text-slate-500">Crunching carbon numbers…</p>
+          <div className="flex flex-col items-center gap-3 py-12" role="status" aria-label="Crunching carbon numbers">
+            <span className="h-8 w-8 motion-safe:animate-spin rounded-full border-4 border-leaf border-t-transparent" aria-hidden="true" />
+            <p className="text-sm text-slate-500" aria-hidden="true">Crunching carbon numbers…</p>
           </div>
         )}
 
@@ -200,7 +200,7 @@ export default function Home() {
           <>
             {state.data.source === "screenshot" && state.data.extraction && (
               <div className="mb-4 rounded-xl bg-slate-100 px-4 py-3 text-sm text-slate-700">
-                <span>📷 From your screenshot: {state.data.extraction.summary}</span>
+                <span><span aria-hidden="true">📷</span> From your screenshot: {state.data.extraction.summary}</span>
                 {state.data.extraction.priceINR !== undefined && (
                   <span> · ₹{state.data.extraction.priceINR.toLocaleString("en-IN")}</span>
                 )}
@@ -221,7 +221,11 @@ export default function Home() {
       </footer>
 
       {toast && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 rounded-full bg-coal px-4 py-2 text-sm font-semibold text-white shadow-lg transition-opacity">
+        <div
+          role="alert"
+          aria-live="polite"
+          className="fixed bottom-6 left-1/2 -translate-x-1/2 rounded-full bg-coal px-4 py-2 text-sm font-semibold text-white shadow-lg transition-opacity"
+        >
           {toast}
         </div>
       )}

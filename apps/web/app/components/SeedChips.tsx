@@ -28,9 +28,9 @@ export default function SeedChips({ onPick, disabled }: Props) {
           type="button"
           onClick={() => onPick(seed.text)}
           disabled={disabled}
-          className="flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm text-coal transition-colors hover:border-leaf hover:bg-leaf/10 disabled:cursor-not-allowed disabled:opacity-50"
+          className="flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm text-coal transition-colors hover:border-leaf hover:bg-leaf/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-leaf disabled:cursor-not-allowed disabled:opacity-50"
         >
-          <span>{seed.emoji}</span>
+          <span aria-hidden="true">{seed.emoji}</span>
           <span>{seed.label}</span>
         </button>
       ))}

@@ -66,7 +66,11 @@ export default function DecisionInput({ onSubmit, isLoading }: Props) {
   return (
     <div className="space-y-3">
       <div className="relative">
+        <label htmlFor="decision-input" className="sr-only">
+          Describe a trip or purchase
+        </label>
         <textarea
+          id="decision-input"
           rows={3}
           value={value}
           onChange={(e) => setValue(e.target.value)}
@@ -81,13 +85,13 @@ export default function DecisionInput({ onSubmit, isLoading }: Props) {
             onClick={toggleMic}
             disabled={isLoading}
             aria-label={listening ? "Stop listening" : "Speak your decision"}
-            className={`absolute bottom-3 right-3 rounded-full p-2 transition-colors disabled:opacity-40 ${
+            className={`absolute bottom-3 right-3 rounded-full p-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-leaf disabled:opacity-40 ${
               listening
-                ? "animate-pulse bg-red-100 text-red-500"
+                ? "motion-safe:animate-pulse bg-red-100 text-red-500"
                 : "bg-slate-100 text-slate-500 hover:bg-slate-200"
             }`}
           >
-            🎤
+            <span aria-hidden="true">🎤</span>
           </button>
         )}
       </div>
@@ -95,12 +99,12 @@ export default function DecisionInput({ onSubmit, isLoading }: Props) {
         type="button"
         onClick={submit}
         disabled={!value.trim() || isLoading}
-        className="flex w-full items-center justify-center gap-2 rounded-2xl bg-leaf py-3 text-base font-semibold text-white shadow-sm transition-colors hover:bg-leafdark disabled:cursor-not-allowed disabled:opacity-50"
+        className="flex w-full items-center justify-center gap-2 rounded-2xl bg-leaf py-3 text-base font-semibold text-white shadow-sm transition-colors hover:bg-leafdark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-leaf focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
       >
         {isLoading ? (
           <>
-            <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-            Comparing…
+            <span className="h-4 w-4 motion-safe:animate-spin rounded-full border-2 border-white border-t-transparent" aria-hidden="true" />
+            <span role="status">Comparing…</span>
           </>
         ) : (
           "Compare options →"

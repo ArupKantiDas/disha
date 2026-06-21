@@ -16,7 +16,7 @@ export default function HowWeCalculate() {
 
   return (
     <details className="rounded-2xl border border-slate-200 bg-white">
-      <summary className="cursor-pointer select-none px-4 py-3 text-sm font-semibold text-slate-600 hover:text-coal">
+      <summary className="cursor-pointer select-none px-4 py-3 text-sm font-semibold text-slate-600 hover:text-coal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-leaf rounded-2xl">
         How we calculate (sourced factors)
       </summary>
 
@@ -37,7 +37,7 @@ export default function HowWeCalculate() {
                 <div className="flex items-center gap-2">
                   <span className="font-medium text-coal">{f.label}</span>
                   {f.verify === false ? (
-                    <span className="rounded-full bg-leaf/15 px-2 py-0.5 text-xs font-semibold text-leaf">
+                    <span className="rounded-full bg-leaf/15 px-2 py-0.5 text-xs font-semibold text-leafdark">
                       ✓ verified
                     </span>
                   ) : f.verify === true ? (

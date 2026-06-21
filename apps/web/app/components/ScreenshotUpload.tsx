@@ -35,9 +35,10 @@ export default function ScreenshotUpload({ onUpload, disabled }: Props) {
         type="button"
         onClick={() => inputRef.current?.click()}
         disabled={disabled}
-        className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-600 shadow-sm transition-colors hover:border-leaf hover:bg-leaf/10 hover:text-leaf disabled:cursor-not-allowed disabled:opacity-50"
+        aria-label="Share a booking screenshot"
+        className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-600 shadow-sm transition-colors hover:border-leaf hover:bg-leaf/10 hover:text-leaf focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-leaf disabled:cursor-not-allowed disabled:opacity-50"
       >
-        📷 Share a screenshot
+        <span aria-hidden="true">📷</span> Share a screenshot
       </button>
       {pickedName && (
         <p className="text-xs text-slate-400 truncate max-w-xs">{pickedName}</p>

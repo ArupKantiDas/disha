@@ -47,7 +47,7 @@ function OptionCard({
         <div className="flex shrink-0 flex-wrap justify-end gap-1.5">
           {option.isRecommended && (
             <span className="rounded-full bg-leaf px-2 py-0.5 text-xs font-semibold text-white">
-              🌿 Greener pick
+              <span aria-hidden="true">🌿 </span>Greener pick
             </span>
           )}
           {option.isDefault && (
@@ -83,25 +83,28 @@ function OptionCard({
       )}
 
       {/* Three axes */}
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-3 gap-3" aria-label={`${option.label} metrics`}>
         <div>
-          <p className="mb-0.5 text-xs text-slate-500">🌿 Carbon</p>
-          <p className="text-lg font-bold leading-none text-coal">
+          <p className="mb-0.5 text-xs text-slate-500" aria-hidden="true"><span aria-hidden="true">🌿</span> Carbon</p>
+          <p className="text-lg font-bold leading-none text-coal" aria-hidden="true">
             {round(option.kgCO2e)}
           </p>
-          <p className="mt-0.5 text-xs text-slate-400">kg CO₂</p>
+          <p className="mt-0.5 text-xs text-slate-400" aria-hidden="true">kg CO₂</p>
+          <span className="sr-only">Carbon: {round(option.kgCO2e)} kg CO2</span>
         </div>
         <div>
-          <p className="mb-0.5 text-xs text-slate-500">💰 Cost</p>
-          <p className="text-lg font-bold leading-none text-coal">
+          <p className="mb-0.5 text-xs text-slate-500" aria-hidden="true"><span aria-hidden="true">💰</span> Cost</p>
+          <p className="text-lg font-bold leading-none text-coal" aria-hidden="true">
             {formatCost(option.costINR)}
           </p>
+          <span className="sr-only">Cost: {formatCost(option.costINR)}</span>
         </div>
         <div>
-          <p className="mb-0.5 text-xs text-slate-500">⏱ Time</p>
-          <p className="text-lg font-bold leading-none text-coal">
+          <p className="mb-0.5 text-xs text-slate-500" aria-hidden="true"><span aria-hidden="true">⏱</span> Time</p>
+          <p className="text-lg font-bold leading-none text-coal" aria-hidden="true">
             {formatDuration(option.durationHours)}
           </p>
+          <span className="sr-only">Time: {formatDuration(option.durationHours)}</span>
         </div>
       </div>
 
@@ -109,7 +112,8 @@ function OptionCard({
         <div className="mt-3 flex justify-end">
           <button
             onClick={() => onTake(option)}
-            className="rounded-full border border-leaf px-3 py-1 text-xs font-semibold text-leaf hover:bg-leaf/10 active:bg-leaf/20 transition-colors"
+            aria-label={`Choose ${option.label}`}
+            className="rounded-full border border-leaf px-3 py-1 text-xs font-semibold text-leafdark hover:bg-leaf/10 active:bg-leaf/20 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-leaf"
           >
             I&apos;ll take this →
           </button>
@@ -144,8 +148,8 @@ export default function ResultCard({
         {intent.summary}
       </p>
 
-      {/* Hero recommended block */}
-      <div className="rounded-2xl bg-leaf p-5 text-white shadow-md">
+      {/* Hero recommended block — bg-leafdark (#15803d) gives 5.0:1 contrast for white text (WCAG AA) */}
+      <div className="rounded-2xl bg-leafdark p-5 text-white shadow-md">
         <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-green-200">
           Recommended
         </p>
@@ -161,7 +165,7 @@ export default function ResultCard({
       {/* India grid-honesty nuance — only when an electric option is in play */}
       {usesGrid && (
         <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs leading-relaxed text-amber-800">
-          ⚡ India&apos;s grid is roughly <span className="font-semibold">0.72 kg CO₂/kWh</span>{" "}
+          <span aria-hidden="true">⚡</span> India&apos;s grid is roughly <span className="font-semibold">0.72 kg CO₂/kWh</span>{" "}
           (coal-heavy), so electric options save less here than Western tools
           claim. The numbers above already account for this.
         </div>

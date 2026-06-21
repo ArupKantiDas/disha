@@ -13,7 +13,11 @@ export default function CommunityStats() {
 
   if (!stats) {
     return (
-      <div className="rounded-2xl border border-leaf/20 bg-leaf/5 px-4 py-4 animate-pulse">
+      <div
+        className="rounded-2xl border border-leaf/20 bg-leaf/5 px-4 py-4 motion-safe:animate-pulse"
+        role="status"
+        aria-label="Loading community stats"
+      >
         <div className="h-8 w-32 bg-leaf/20 rounded mb-2" />
         <div className="h-4 w-48 bg-leaf/10 rounded" />
       </div>
@@ -48,7 +52,7 @@ export default function CommunityStats() {
         <p className="text-3xl font-bold text-coal">
           {Math.round(stats.totalKgAvoided)} kg
         </p>
-        <p className="mt-0.5 text-sm font-semibold text-leaf">CO₂ avoided together</p>
+        <p className="mt-0.5 text-sm font-semibold text-leafdark">CO₂ avoided together</p>
         <p className="mt-1 text-xs text-slate-500">
           {plural(stats.totalDecisions, "decision", "decisions")} ·{" "}
           {plural(stats.totalUsers, "person", "people")}
@@ -67,7 +71,7 @@ export default function CommunityStats() {
       </div>
 
       {trend.length > 1 && (
-        <div aria-label="Daily trend sparkline" role="img">
+        <div aria-label="Community CO2 avoided trend, last 30 days" role="img">
           <svg
             viewBox={`0 0 ${W} ${H}`}
             width="100%"

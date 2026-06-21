@@ -19,7 +19,7 @@ export default function AvoidedCounter({ kgAvoidedTotal, decisionCount }: Props)
       <p className="text-3xl font-bold text-coal">
         {Math.round(kgAvoidedTotal)} kg
       </p>
-      <p className="mt-0.5 text-sm font-medium text-leaf">CO₂ avoided · lifetime</p>
+      <p className="mt-0.5 text-sm font-medium text-leafdark">CO₂ avoided · lifetime</p>
       <p className="mt-1 text-xs text-slate-500">
         {decisionCount} greener decision{decisionCount === 1 ? "" : "s"}
       </p>

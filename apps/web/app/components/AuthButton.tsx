@@ -14,7 +14,7 @@ export default function AuthButton({ auth: { user, loading, signInWithGoogle, si
       <button
         onClick={signInWithGoogle}
         aria-label="Sign in with Google"
-        className="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-coal shadow-sm hover:bg-slate-50 active:bg-slate-100 transition-colors"
+        className="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-coal shadow-sm hover:bg-slate-50 active:bg-slate-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-leaf"
       >
         <GoogleIcon />
         Sign in
@@ -30,7 +30,7 @@ export default function AuthButton({ auth: { user, loading, signInWithGoogle, si
       <button
         onClick={signOutUser}
         aria-label="Sign out"
-        className="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-coal shadow-sm hover:bg-slate-50 active:bg-slate-100 transition-colors"
+        className="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-coal shadow-sm hover:bg-slate-50 active:bg-slate-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-leaf"
       >
         {avatar ? (
           // eslint-disable-next-line @next/next/no-img-element
