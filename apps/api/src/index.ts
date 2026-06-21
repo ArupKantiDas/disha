@@ -48,7 +48,14 @@ const geminiLimiter = rateLimit({
   message: { error: "Too many requests, please slow down." },
 });
 
-app.use(express.json({ limit: "1mb" }));
+// 1 mb JSON for every route EXCEPT /compare-image, which needs 10 mb for the
+// base64 screenshot and applies its own parser inline. Without this skip, the
+// 1 mb global parser would 413 a large image before the route's 10 mb parser runs.
+const jsonSmall = express.json({ limit: "1mb" });
+app.use((req, res, next) => {
+  if (req.path === "/compare-image") return next();
+  return jsonSmall(req, res, next);
+});
 
 app.get("/health", (_req, res) => {
   res.json({
