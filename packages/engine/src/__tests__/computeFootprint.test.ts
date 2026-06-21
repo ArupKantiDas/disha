@@ -157,6 +157,82 @@ describe("computeFootprint — direction-correct (greener is always lower)", () 
   });
 });
 
+describe("computeFootprint — dynamicFactor (live-retrieved factor path)", () => {
+  test("uses perUnitFactor × quantity and returns dynamic:true", () => {
+    const r = computeFootprint({
+      label: "Leather sofa",
+      factorKey: "dynamic.lookup",
+      units: 1,
+      dynamicFactor: {
+        perUnitFactor: 250,
+        unit: "kg_co2e_per_unit",
+        source: "IPCC AR6 (2021)",
+        confidence: "medium",
+      },
+    });
+    expect(r.kgCO2e).toBe(250);
+    expect(r.dynamic).toBe(true);
+    expect(r.factorSource).toBe("IPCC AR6 (2021)");
+    expect(r.confidence).toBe("medium");
+  });
+
+  test("quantity scaling works: 2 units × 125 kg/unit = 250 kg", () => {
+    const r = computeFootprint({
+      label: "Fabric sofa",
+      factorKey: "dynamic.lookup",
+      units: 2,
+      dynamicFactor: {
+        perUnitFactor: 125,
+        unit: "kg_co2e_per_unit",
+        source: "Test",
+        confidence: "high",
+      },
+    });
+    expect(r.kgCO2e).toBe(250);
+  });
+
+  test("determinism holds for dynamic options", () => {
+    const o: Option = {
+      label: "Leather sofa",
+      factorKey: "dynamic.lookup",
+      units: 1,
+      dynamicFactor: {
+        perUnitFactor: 250,
+        unit: "kg_co2e_per_unit",
+        source: "Test",
+        confidence: "high",
+      },
+    };
+    const runs = Array.from({ length: 30 }, () => computeFootprint(o).kgCO2e);
+    expect(new Set(runs).size).toBe(1);
+  });
+
+  test("seeded option returns dynamic:false", () => {
+    const r = computeFootprint({
+      label: "Train",
+      factorKey: "transport.train_ac_electric",
+      distanceKm: 1000,
+    });
+    expect(r.dynamic).toBe(false);
+    expect(r.factorSource).toBeUndefined();
+  });
+
+  test("dynamicFactor.perUnitFactor <= 0 throws", () => {
+    expect(() =>
+      computeFootprint({
+        label: "Bad",
+        factorKey: "dynamic.lookup",
+        units: 1,
+        dynamicFactor: {
+          perUnitFactor: 0,
+          unit: "kg_co2e_per_unit",
+          source: "Test",
+        },
+      }),
+    ).toThrow(/perUnitFactor must be > 0/);
+  });
+});
+
 describe("computeFootprint — guards (a missing factor is a bug, not a guess)", () => {
   test("unknown factorKey throws", () => {
     expect(() =>

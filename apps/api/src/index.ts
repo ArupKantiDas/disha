@@ -4,6 +4,7 @@ import { factorCatalog } from "@disha/engine";
 import { compare } from "./compare.js";
 import { PORT, isGeminiConfigured } from "./config.js";
 import { parseDecision } from "./gemini/parseDecision.js";
+import { resolveDynamicFactors } from "./resolveDynamic.js";
 import { compareFromScreenshot } from "./screenshotFlow.js";
 import { commitDecision, getLedger, getRecentDecisions, getStats } from "./ledger.js";
 import { verifyIdToken } from "./firebaseAdmin.js";
@@ -41,14 +42,15 @@ app.post("/parse", async (req, res) => {
   }
 });
 
-// Phase 3 — the core. Text -> parse -> engine -> ranked comparison.
+// Phase 3 — the core. Text -> parse -> dynamic resolution -> engine -> ranked comparison.
 app.post("/compare", async (req, res) => {
   const text = typeof req.body?.text === "string" ? req.body.text : "";
   if (!text.trim()) {
     return res.status(400).json({ error: "Provide a non-empty 'text' field." });
   }
   try {
-    const parsed = await parseDecision(text);
+    let parsed = await parseDecision(text);
+    parsed = await resolveDynamicFactors(parsed);
     res.json({ ...compare(parsed), source: "text" });
   } catch (err) {
     handleError(res, err);

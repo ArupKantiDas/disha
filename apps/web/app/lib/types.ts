@@ -28,6 +28,10 @@ export interface RankedOption {
   isRecommended: boolean;
   isDefault: boolean;
   kgVsDefault?: number;
+  dynamic?: boolean;
+  factorSource?: string;
+  factorSourceUrl?: string;
+  confidence?: "high" | "medium" | "low";
 }
 
 export interface ScreenshotExtraction {

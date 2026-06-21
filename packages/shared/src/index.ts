@@ -38,6 +38,10 @@ export interface Candidate extends Option {
   costINR?: number;
   /** Estimated door-to-door duration in hours. A labeled estimate. */
   durationHours?: number;
+  /** Set by Gemini when factorKey === "dynamic.lookup": the precise item to search for. */
+  lookupTerm?: string;
+  /** Set by Gemini when factorKey === "dynamic.lookup": the unit family that fits. */
+  factorUnit?: string;
 }
 
 /** Gemini's interpretation output: intent + the set of candidates. */
@@ -63,6 +67,14 @@ export interface RankedOption extends Candidate {
    * greener than the default; undefined when there is no known default.
    */
   kgVsDefault?: number;
+  /** True when the factor was retrieved live via Google Search, not from the seeded table. */
+  dynamic?: boolean;
+  /** Publisher + year of the dynamically retrieved factor. */
+  factorSource?: string;
+  /** URL of the grounding source page. */
+  factorSourceUrl?: string;
+  /** Confidence tier of the dynamic factor. */
+  confidence?: "high" | "medium" | "low";
 }
 
 /** What the screenshot door read from the image (route, price, mode only). */

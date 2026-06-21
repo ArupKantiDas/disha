@@ -2,6 +2,7 @@ import type { Candidate, CompareResponse } from "@disha/shared";
 import { compare } from "./compare.js";
 import { extractScreenshot } from "./gemini/extractScreenshot.js";
 import { parseDecision } from "./gemini/parseDecision.js";
+import { resolveDynamicFactors } from "./resolveDynamic.js";
 
 // Natural-language word for each extracted mode, used to phrase the synthesized
 // decision text the parser then expands into a full candidate set.
@@ -55,7 +56,7 @@ export async function compareFromScreenshot(
     ? `I am about to book a ${modeWord} from ${route}${priceBit}. Compare greener ways to make this trip.`
     : `${ex.summary}. I am about to take the ${modeWord} option${priceBit}. Compare greener alternatives.`;
 
-  const parsed = await parseDecision(text);
+  let parsed = await parseDecision(text);
 
   // The screenshot IS what they were going to do — anchor it as the default,
   // and trust the real fare from the image over the model's estimate.
@@ -64,6 +65,8 @@ export async function compareFromScreenshot(
     parsed.intent.defaultMode = def.mode;
     if (ex.priceINR != null) def.costINR = ex.priceINR;
   }
+
+  parsed = await resolveDynamicFactors(parsed);
 
   const result = compare(parsed);
   return { ...result, source: "screenshot", extraction: ex };

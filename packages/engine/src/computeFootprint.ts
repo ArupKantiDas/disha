@@ -42,11 +42,41 @@ const round = (n: number, dp = 4): number => {
 /**
  * Pure, deterministic carbon math. Same option in -> same number out, always.
  * No I/O, no randomness, no model. The full credibility core of Disha.
+ *
+ * When option.dynamicFactor is set, uses it in place of getFactorNode (which
+ * would fail for the sentinel key "dynamic.lookup"). Seeded behaviour is
+ * completely unchanged.
  */
 export function computeFootprint(option: Option): FootprintResult {
-  const node = getFactorNode(option.factorKey);
-  const perUnitFactor = resolvePerUnitFactor(node, option.factorKey);
-  const unit = node.unit ?? inferUnit(node);
+  let perUnitFactor: number;
+  let unit: string;
+  let dynamic: boolean;
+  let factorSource: string | undefined;
+  let factorSourceUrl: string | undefined;
+  let confidence: "high" | "medium" | "low" | undefined;
+  // occupancy_default only exists on seeded nodes; keep undefined for dynamic.
+  let occupancyDefault: number | undefined;
+
+  if (option.dynamicFactor) {
+    const df = option.dynamicFactor;
+    if (!(df.perUnitFactor > 0)) {
+      throw new Error(
+        `dynamicFactor.perUnitFactor must be > 0 for "${option.factorKey}"`,
+      );
+    }
+    perUnitFactor = df.perUnitFactor;
+    unit = df.unit;
+    dynamic = true;
+    factorSource = df.source;
+    factorSourceUrl = df.sourceUrl;
+    confidence = df.confidence;
+  } else {
+    const node = getFactorNode(option.factorKey);
+    perUnitFactor = resolvePerUnitFactor(node, option.factorKey);
+    unit = node.unit ?? inferUnit(node);
+    occupancyDefault = node.occupancy_default;
+    dynamic = false;
+  }
 
   let quantity: number;
   let occupancy: number | undefined;
@@ -62,7 +92,7 @@ export function computeFootprint(option: Option): FootprintResult {
     }
     case "kg_co2e_per_vehicle_km": {
       quantity = requirePositive(option.distanceKm, "distanceKm", option.factorKey);
-      occupancy = option.occupancy ?? node.occupancy_default ?? 1;
+      occupancy = option.occupancy ?? occupancyDefault ?? 1;
       if (occupancy <= 0) {
         throw new Error(`occupancy must be > 0 for "${option.factorKey}"`);
       }
@@ -109,6 +139,10 @@ export function computeFootprint(option: Option): FootprintResult {
     quantity,
     occupancy,
     basis,
+    dynamic,
+    factorSource,
+    factorSourceUrl,
+    confidence,
   };
 }
 

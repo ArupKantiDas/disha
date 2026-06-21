@@ -37,6 +37,19 @@ export interface Option {
    * factors, which are already per passenger.
    */
   occupancy?: number;
+
+  /**
+   * Present only when factorKey === "dynamic.lookup". Carries a factor
+   * retrieved live via Google Search instead of from the seeded table.
+   * The engine uses this in place of getFactorNode when set.
+   */
+  dynamicFactor?: {
+    perUnitFactor: number;
+    unit: string;
+    source: string;
+    sourceUrl?: string;
+    confidence?: "high" | "medium" | "low";
+  };
 }
 
 /** The transparent result of a footprint computation. */
@@ -57,4 +70,12 @@ export interface FootprintResult {
   occupancy?: number;
   /** Plain-language explanation, e.g. "0.012 kg/pkm x 1870 km". */
   basis: string;
+  /** True when the factor came from a live Google Search lookup, not the seeded table. */
+  dynamic: boolean;
+  /** Publisher + year of the dynamically retrieved factor, if dynamic. */
+  factorSource?: string;
+  /** URL of the grounding source page, if available. */
+  factorSourceUrl?: string;
+  /** Confidence tier of the dynamic factor. */
+  confidence?: "high" | "medium" | "low";
 }

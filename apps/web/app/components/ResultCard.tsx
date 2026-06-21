@@ -55,8 +55,32 @@ function OptionCard({
               Your usual
             </span>
           )}
+          {option.dynamic && (
+            <span className="rounded-full bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-800 border border-amber-200">
+              estimated
+            </span>
+          )}
         </div>
       </div>
+
+      {/* Dynamic factor source attribution */}
+      {option.dynamic && option.factorSource && (
+        <p className="mb-2 text-xs text-amber-700">
+          est.{" "}
+          {option.factorSourceUrl ? (
+            <a
+              href={option.factorSourceUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline hover:text-amber-900"
+            >
+              {option.factorSource}
+            </a>
+          ) : (
+            option.factorSource
+          )}
+        </p>
+      )}
 
       {/* Three axes */}
       <div className="grid grid-cols-3 gap-3">
@@ -111,6 +135,8 @@ export default function ResultCard({
     (o) => o.factorKey === "transport.car_ev" || o.factorKey.startsWith("appliances."),
   );
 
+  const hasDynamic = options.some((o) => o.dynamic);
+
   return (
     <div className="space-y-5">
       {/* Intent summary */}
@@ -153,6 +179,11 @@ export default function ResultCard({
             onTake={onTake}
           />
         ))}
+        {hasDynamic && (
+          <p className="pt-1 text-xs leading-relaxed text-slate-400">
+            Options marked &apos;estimated&apos; use a factor retrieved live, not our verified table.
+          </p>
+        )}
       </div>
     </div>
   );

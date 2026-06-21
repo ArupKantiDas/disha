@@ -45,6 +45,15 @@ Vehicle PURCHASE decisions (e.g. "buy a BMW M3"):
 - Do NOT offer train, bus, auto, a two-wheeler, or a budget hatchback (e.g. an Alto) as alternatives to a premium car.
 - Compare the DRIVING footprint over a representative year: set distanceKm = 12000 for every vehicle candidate (like-for-like), set costINR to the rough purchase price, and omit durationHours (not meaningful for a purchase). Make labels descriptive and segment-appropriate.
 
+DYNAMIC LOOKUP — for items not in the seeded factor table:
+- If NONE of the allowed factor keys reasonably fits an option, set factorKey to "dynamic.lookup" and also provide:
+    lookupTerm: the BROADEST product-category name an LCA paper or database would use — the general type, not the specific material/brand variant (e.g. "sofa upholstered furniture lifecycle carbon" not "leather sofa India"; "wooden furniture" not "oak dining table handmade"). This broadness is critical: LCA databases index by product category, not by specific regional variant, so a general term yields a usable factor far more reliably.
+    factorUnit: the unit family that fits this item (one of: kg_co2e_per_unit, kg_co2e_per_pkm, kg_co2e_per_vehicle_km, kg_co2e_per_hour, kg_co2e_per_meal, kg_co2e_per_kwh).
+    Plus the matching quantity field (units, distanceKm, hours, meals, or kwh).
+- When two options differ only in material or brand (leather vs fabric sofa, bamboo vs plastic desk), they can SHARE the same lookupTerm for the general product category — the carbon difference between material variants is usually small and the same broad LCA factor is a reasonable approximation.
+- ALWAYS prefer a real seeded key when one fits. Only use dynamic.lookup for genuinely unlisted items (e.g. furniture, non-standard foods, unlisted goods).
+- Do NOT use dynamic.lookup for any transport, standard diet, or standard appliance key that already exists in the table.
+
 Output ONLY JSON conforming to the provided schema. No prose, no markdown.`;
 
 function buildPrompt(userText: string): string {

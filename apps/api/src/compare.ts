@@ -26,7 +26,15 @@ export function compare(parsed: ParseResult): CompareResponse {
   // 1. Compute carbon for every candidate via the pure engine.
   const computed = candidates.map((c) => {
     const f = computeFootprint(c);
-    return { ...c, kgCO2e: f.kgCO2e, basis: f.basis };
+    return {
+      ...c,
+      kgCO2e: f.kgCO2e,
+      basis: f.basis,
+      dynamic: f.dynamic,
+      factorSource: f.factorSource,
+      factorSourceUrl: f.factorSourceUrl,
+      confidence: f.confidence,
+    };
   });
 
   // 2. Rank ascending by carbon (greenest first).
