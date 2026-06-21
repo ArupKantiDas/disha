@@ -3,6 +3,8 @@ export {
   factors,
   gridFactor,
   getFactorNode,
+  listFactorKeys,
+  factorCatalog,
   type FactorNode,
   type FactorTable,
 } from "./factors";

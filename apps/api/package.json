@@ -11,8 +11,13 @@
     "test": "echo \"(api) no tests yet\" && exit 0"
   },
   "dependencies": {
+    "@disha/engine": "*",
+    "@disha/shared": "*",
+    "@google/genai": "^2.9.0",
     "cors": "^2.8.5",
-    "express": "^4.19.2"
+    "dotenv": "^17.4.2",
+    "express": "^4.19.2",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",

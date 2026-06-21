@@ -32,6 +32,65 @@ export function gridFactor(): number {
   return factors.grid.electricity_kwh.factor;
 }
 
+/** Top-level sections of the table that hold factor nodes. */
+const FACTOR_SECTIONS = ["grid", "transport", "appliances", "diet", "goods"] as const;
+
+/** True if a node looks like a usable factor (direct or grid-derived). */
+function isFactorNode(node: unknown): node is FactorNode {
+  if (node == null || typeof node !== "object") return false;
+  const n = node as Record<string, unknown>;
+  return "factor" in n || "computed" in n || "unit" in n;
+}
+
+/**
+ * All valid dotted factor keys, e.g. "transport.flight_domestic". Used to
+ * constrain Gemini to real keys (it cannot invent one) and to render the
+ * "how we calculate" credibility panel.
+ */
+export function listFactorKeys(): string[] {
+  const keys: string[] = [];
+  for (const section of FACTOR_SECTIONS) {
+    const node = (factors as Record<string, unknown>)[section];
+    if (node == null || typeof node !== "object") continue;
+    for (const [child, value] of Object.entries(node)) {
+      if (isFactorNode(value)) keys.push(`${section}.${child}`);
+    }
+  }
+  return keys;
+}
+
+/** A flat, display-ready view of every factor for the credibility panel. */
+export function factorCatalog(): Array<{
+  key: string;
+  label: string;
+  perUnitFactor: number | null;
+  unit: string;
+  source?: string;
+  note?: string;
+  verify?: boolean;
+}> {
+  return listFactorKeys().map((key) => {
+    const node = getFactorNode(key);
+    const perUnitFactor =
+      typeof node.factor === "number"
+        ? node.factor
+        : typeof node.energy_kwh_per_km === "number"
+          ? node.energy_kwh_per_km * gridFactor()
+          : typeof node.energy_kwh_per_hour === "number"
+            ? node.energy_kwh_per_hour * gridFactor()
+            : null;
+    return {
+      key,
+      label: node.label ?? key,
+      perUnitFactor,
+      unit: node.unit ?? "(grid-derived)",
+      source: node.source,
+      note: node.note ?? node.honesty_note,
+      verify: node.verify,
+    };
+  });
+}
+
 /**
  * Resolve a dotted factor key (e.g. "transport.flight_domestic") to its node.
  * Throws on an unknown key — a missing factor is a bug, never a guess.
