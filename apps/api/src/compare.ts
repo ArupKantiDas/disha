@@ -45,7 +45,7 @@ export function compare(parsed: ParseResult): CompareResponse {
     isRecommended: i === 0,
     isDefault: defaultComputed ? c.mode === defaultComputed.mode : false,
     kgVsDefault: defaultComputed
-      ? Math.max(0, defaultComputed.kgCO2e - c.kgCO2e)
+      ? Math.round(Math.max(0, defaultComputed.kgCO2e - c.kgCO2e) * 10) / 10
       : undefined,
   }));
 

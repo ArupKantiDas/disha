@@ -2,7 +2,7 @@ import cors from "cors";
 import express from "express";
 import { factorCatalog } from "@disha/engine";
 import { compare } from "./compare.js";
-import { PORT, hasGeminiKey } from "./config.js";
+import { PORT, isGeminiConfigured } from "./config.js";
 import { parseDecision } from "./gemini/parseDecision.js";
 
 const app = express();
@@ -14,7 +14,7 @@ app.get("/health", (_req, res) => {
   res.json({
     service: "disha-api",
     status: "ok",
-    geminiConfigured: hasGeminiKey(),
+    geminiConfigured: isGeminiConfigured(),
     message: "Disha API is alive. Gemini interprets, the engine computes.",
   });
 });
@@ -54,12 +54,12 @@ app.post("/compare", async (req, res) => {
 
 function handleError(res: express.Response, err: unknown) {
   const message = err instanceof Error ? err.message : "Unknown error";
-  const status = message.includes("GEMINI_API_KEY") ? 503 : 502;
+  const status = message.includes("not set") ? 503 : 502;
   console.error("[disha-api] error:", message);
   res.status(status).json({ error: message });
 }
 
 app.listen(PORT, () => {
   console.log(`[disha-api] listening on http://localhost:${PORT}`);
-  console.log(`[disha-api] gemini configured: ${hasGeminiKey()}`);
+  console.log(`[disha-api] gemini configured: ${isGeminiConfigured()}`);
 });

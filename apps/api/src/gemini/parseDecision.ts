@@ -25,8 +25,12 @@ Hard rules:
     diet keys -> meals (default 1)
     goods keys -> units (default 1)
 - occupancy: passengers per vehicle for car/auto/two-wheeler keys. Default 1 (solo) unless the user implies sharing.
+- "keep / don't buy / skip / avoid" options: use the most relevant factor with a quantity of 0, because that choice manufactures or consumes nothing extra. Example: "keep my phone another year" -> goods.smartphone_new with units 0 (label it "Keep current phone"), versus "buy new" -> units 1.
 - costINR and durationHours: realistic India estimates, door-to-door. These are clearly-labeled ESTIMATES, never scraped, never the carbon number.
-- defaultMode: the option the user is already leaning toward or currently does. Set it to that candidate's "mode". For a work/leisure trip with no hint, default to the flight. It anchors how much carbon they avoid.
+- defaultMode: the option the user would pick WITHOUT this tool — what Disha is intervening on. Set it to that candidate's "mode".
+    - If the user states or implies a mode (or a screenshot shows one), use that.
+    - Otherwise infer the habitual, convenient choice a typical person in India would make for THIS exact decision: usually the faster/easier or higher-spend option — flight for a long intercity work trip, car or cab for a short city-to-city hop, AC over cooler in summer, buying new for an upgrade urge.
+    - Do NOT default to the greenest option unless the user clearly already prefers it. The default anchors how much carbon they avoid, so it must reflect real habit, not the best case and not the worst case.
 - summary: one concise line restating the decision.
 
 Trip guidance: for an intercity trip, include the sensible subset of flight, train (AC), intercity bus, and petrol car. Add two-wheeler or auto only for short city hops where they make sense.

@@ -11,11 +11,13 @@ const candidateZod = z.object({
   label: z.string().min(1),
   mode: z.string().min(1),
   factorKey: z.enum(factorKeyEnum),
-  distanceKm: z.number().positive().optional(),
-  hours: z.number().positive().optional(),
-  meals: z.number().positive().optional(),
-  units: z.number().positive().optional(),
-  kwh: z.number().positive().optional(),
+  // Quantities are >= 0: a quantity of 0 expresses a "keep / avoid / skip"
+  // baseline option (e.g. keeping your phone = 0 new units manufactured).
+  distanceKm: z.number().nonnegative().optional(),
+  hours: z.number().nonnegative().optional(),
+  meals: z.number().nonnegative().optional(),
+  units: z.number().nonnegative().optional(),
+  kwh: z.number().nonnegative().optional(),
   occupancy: z.number().positive().optional(),
   costINR: z.number().nonnegative().optional(),
   durationHours: z.number().nonnegative().optional(),
