@@ -105,7 +105,7 @@ export default function Home() {
       getStats().then(setStats).catch(() => {});
       showToast("Logged ✓");
     } catch {
-      showToast("Could not log — try again.");
+      showToast("Could not log try again.");
     }
   }
 
@@ -120,7 +120,7 @@ export default function Home() {
             Tell us a trip or a purchase. We rank your real options across{" "}
             <span className="font-semibold text-coal">carbon</span>,{" "}
             <span className="font-semibold text-coal">cost</span>, and{" "}
-            <span className="font-semibold text-coal">time</span> — before you spend a rupee.
+            <span className="font-semibold text-coal">time</span> before you spend a rupee.
           </p>
         </div>
         {!authLoading && <AuthButton auth={authState} />}
@@ -137,7 +137,7 @@ export default function Home() {
         </div>
       )}
 
-      {/* Community stats — visible to all on landing */}
+      {/* Community stats visible to all on landing */}
       <div className="mb-6">
         <CommunityStats />
       </div>
@@ -217,7 +217,7 @@ export default function Home() {
 
       <footer className="mt-12 border-t border-slate-100 pt-6 text-xs text-slate-400">
         Gemini interprets. The engine computes. Carbon math from verified CEA &amp;
-        rail factors — never guessed.
+        rail factors never guessed.
       </footer>
 
       {toast && (

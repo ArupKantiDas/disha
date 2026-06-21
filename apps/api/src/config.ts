@@ -16,8 +16,8 @@ export const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
 
 /**
  * Which Gemini backend to use:
- *  - "vertex"   -> Vertex AI on Google Cloud, authed via ADC (gcloud). No key.
- *  - "aistudio" -> Gemini Developer API with an AIza key.
+ * - "vertex" -> Vertex AI on Google Cloud, authed via ADC (gcloud). No key.
+ * - "aistudio" -> Gemini Developer API with an AIza key.
  * Default is vertex: it sidesteps the AQ.-restricted-key problem and keeps
  * everything inside the Google Cloud project.
  */

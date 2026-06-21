@@ -4,11 +4,11 @@
  * Gemini produces these (label, factorKey, quantities); it never produces a
  * carbon number. Exactly one quantity field is relevant per option, chosen by
  * the referenced factor's `unit`:
- *   - per-pkm / per-vehicle-km transport  -> distanceKm
- *   - per-hour appliances                 -> hours
- *   - per-meal diet                       -> meals
- *   - per-unit goods                      -> units
- *   - raw grid electricity                -> kwh
+ * - per-pkm / per-vehicle-km transport -> distanceKm
+ * - per-hour appliances -> hours
+ * - per-meal diet -> meals
+ * - per-unit goods -> units
+ * - raw grid electricity -> kwh
  */
 export interface Option {
   /** Stable id, useful when ranking a set. Optional. */

@@ -23,7 +23,7 @@ export async function resolveDynamicFactors(
 
       if (!lookupTerm || !factorUnit) {
         console.warn(
-          "[resolveDynamic] dynamic.lookup candidate missing lookupTerm or factorUnit — dropping",
+          "[resolveDynamic] dynamic.lookup candidate missing lookupTerm or factorUnit dropping",
           c.label,
         );
         return null;
@@ -34,7 +34,7 @@ export async function resolveDynamicFactors(
         console.warn(
           "[resolveDynamic] Could not resolve factor for:",
           lookupTerm,
-          "— dropping candidate",
+          " dropping candidate",
           c.label,
         );
         return null;

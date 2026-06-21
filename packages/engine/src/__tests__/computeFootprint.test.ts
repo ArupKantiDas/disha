@@ -5,7 +5,7 @@ import type { Option } from "../types";
 // Helper to keep the known-value assertions readable.
 const co2 = (o: Option) => computeFootprint(o).kgCO2e;
 
-describe("computeFootprint — known routes (known in, known out)", () => {
+describe("computeFootprint known routes (known in, known out)", () => {
   test("domestic flight: 0.246 kg/pkm x 1000 km = 246 kg", () => {
     expect(
       co2({ label: "Flight", factorKey: "transport.flight_domestic", distanceKm: 1000 }),
@@ -58,7 +58,7 @@ describe("computeFootprint — known routes (known in, known out)", () => {
   });
 });
 
-describe("computeFootprint — grid-derived (the India honesty angle)", () => {
+describe("computeFootprint grid-derived (the India honesty angle)", () => {
   test("grid factor is the CEA seed value 0.72", () => {
     expect(gridFactor()).toBe(0.72);
   });
@@ -87,7 +87,7 @@ describe("computeFootprint — grid-derived (the India honesty angle)", () => {
   });
 });
 
-describe("computeFootprint — determinism", () => {
+describe("computeFootprint determinism", () => {
   test("same option in -> identical number out, repeatedly", () => {
     const o: Option = {
       label: "Train",
@@ -109,7 +109,7 @@ describe("computeFootprint — determinism", () => {
   });
 });
 
-describe("computeFootprint — direction-correct (greener is always lower)", () => {
+describe("computeFootprint direction-correct (greener is always lower)", () => {
   const D = 1500; // a fixed comparison distance
 
   const at = (factorKey: string, occupancy?: number) =>
@@ -128,7 +128,7 @@ describe("computeFootprint — direction-correct (greener is always lower)", () 
     expect(petrolSolo).toBeLessThan(flight);
   });
 
-  test("EV is cleaner than petrol at equal occupancy — but not by a Western margin", () => {
+  test("EV is cleaner than petrol at equal occupancy but not by a Western margin", () => {
     const evSolo = at("transport.car_ev", 1);
     const petrolSolo = at("transport.car_petrol", 1);
     expect(evSolo).toBeLessThan(petrolSolo);
@@ -157,7 +157,7 @@ describe("computeFootprint — direction-correct (greener is always lower)", () 
   });
 });
 
-describe("computeFootprint — dynamicFactor (live-retrieved factor path)", () => {
+describe("computeFootprint dynamicFactor (live-retrieved factor path)", () => {
   test("uses perUnitFactor × quantity and returns dynamic:true", () => {
     const r = computeFootprint({
       label: "Leather sofa",
@@ -233,7 +233,7 @@ describe("computeFootprint — dynamicFactor (live-retrieved factor path)", () =
   });
 });
 
-describe("computeFootprint — guards (a missing factor is a bug, not a guess)", () => {
+describe("computeFootprint guards (a missing factor is a bug, not a guess)", () => {
   test("unknown factorKey throws", () => {
     expect(() =>
       computeFootprint({ label: "x", factorKey: "transport.teleporter", distanceKm: 10 }),

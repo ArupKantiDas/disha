@@ -5,7 +5,7 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Disha palette — "disha" = direction. Green for the better path.
+        // Disha palette "disha" = direction. Green for the better path.
         leaf: "#16a34a",
         leafdark: "#15803d",
         coal: "#0f172a",

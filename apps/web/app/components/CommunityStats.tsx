@@ -25,7 +25,7 @@ export default function CommunityStats() {
   }
 
   const trees = Math.round(stats.totalKgAvoided / 21);
-  // km of petrol driving avoided — meaningful at every scale (unlike whole flights).
+  // km of petrol driving avoided meaningful at every scale (unlike whole flights).
   const kmDriving = Math.round(stats.totalKgAvoided / 0.17);
   const plural = (n: number, one: string, many: string) =>
     `${n.toLocaleString()} ${n === 1 ? one : many}`;

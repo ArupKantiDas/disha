@@ -1,4 +1,4 @@
-# PROMPT_LOG — how Gemini is prompted in Disha
+# PROMPT_LOG how Gemini is prompted in Disha
 
 Disha uses Gemini 2.5 Flash for exactly two jobs, both **interpretation only**. Gemini never produces a carbon number; the engine does. This log records the prompts and the design decisions behind them.
 
@@ -9,9 +9,9 @@ Disha uses Gemini 2.5 Flash for exactly two jobs, both **interpretation only**. 
 **Key design choices:**
 - **Strict JSON, enforced twice.** `responseMimeType: "application/json"` + a `responseSchema`, then zod validation server-side. Malformed or off-contract output is rejected and re-asked once; we never guess past a bad parse.
 - **`factorKey` is a closed enum.** The allowed keys are derived at runtime from `india-factors.json` (`listFactorKeys()`) and passed both in the schema enum and in the prompt. The model physically cannot invent a factor.
-- **Interpretation, not computation.** The system instruction is explicit: "You INTERPRET. You NEVER output a carbon, CO2, or emissions number — a separate verified engine computes all emissions from the factorKey and quantities you provide."
+- **Interpretation, not computation.** The system instruction is explicit: "You INTERPRET. You NEVER output a carbon, CO2, or emissions number a separate verified engine computes all emissions from the factorKey and quantities you provide."
 - **Quantities are inputs, not carbon.** Gemini provides `distanceKm` (route estimate), `hours`, `meals`, `units`, and `occupancy`. A quantity of `0` is allowed to express a "keep / avoid / skip" baseline (e.g. keeping a phone = 0 new units).
-- **Default = habit, not best or worst.** The hardest prompt-tuning lesson: early versions let Gemini pick the *greenest* option as the user's default, which made the nudge collapse to "you're already greenest." The fix instructs Gemini to infer the *habitual, convenient* choice the user would make without the tool (flight for a long work trip, car for a short hop, buy-new for an upgrade urge) — never the greenest, never the worst. This keeps the avoided delta honest (hard rule 6) while keeping the intervention meaningful.
+- **Default = habit, not best or worst.** The hardest prompt-tuning lesson: early versions let Gemini pick the *greenest* option as the user's default, which made the nudge collapse to "you're already greenest." The fix instructs Gemini to infer the *habitual, convenient* choice the user would make without the tool (flight for a long work trip, car for a short hop, buy-new for an upgrade urge) never the greenest, never the worst. This keeps the avoided delta honest (hard rule 6) while keeping the intervention meaningful.
 - `temperature: 0` for stability.
 
 ## 2. Screenshot extraction (`apps/api/src/gemini/extractScreenshot.ts`)

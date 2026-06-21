@@ -58,7 +58,7 @@ export async function compareFromScreenshot(
 
   let parsed = await parseDecision(text);
 
-  // The screenshot IS what they were going to do — anchor it as the default,
+  // The screenshot IS what they were going to do anchor it as the default,
   // and trust the real fare from the image over the model's estimate.
   const def = findDefaultCandidate(parsed.candidates, ex.mode);
   if (def) {

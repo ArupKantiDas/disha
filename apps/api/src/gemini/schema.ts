@@ -31,7 +31,7 @@ const candidateZod = z
     occupancy: z.number().positive().optional(),
     costINR: z.number().nonnegative().optional(),
     durationHours: z.number().nonnegative().optional(),
-    // Dynamic lookup fields — only required when factorKey === "dynamic.lookup".
+    // Dynamic lookup fields only required when factorKey === "dynamic.lookup".
     lookupTerm: z.string().optional(),
     factorUnit: z.enum([...UNIT_FAMILIES] as [string, ...string[]]).optional(),
   })

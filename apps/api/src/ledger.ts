@@ -12,7 +12,7 @@ function firestore(): Firestore {
 
 const COLLECTION = "ledgers";
 
-/** A device's lifetime avoided total — the counter that only ever grows. */
+/** A device's lifetime avoided total the counter that only ever grows. */
 export interface LedgerState {
   kgAvoidedTotal: number;
   decisionCount: number;
@@ -56,7 +56,7 @@ export async function getLedger(clientId: string): Promise<LedgerState> {
 
 /**
  * Log a chosen greener decision. kgAvoided is the saving versus the user's
- * stated default — clamped to >= 0 so the lifetime counter only grows and is
+ * stated default clamped to >= 0 so the lifetime counter only grows and is
  * never inflated past a sane bound.
  */
 export async function commitDecision(
@@ -90,7 +90,7 @@ export async function commitDecision(
     at: FieldValue.serverTimestamp(),
   });
 
-  // Best-effort community aggregates — never block the ledger response.
+  // Best-effort community aggregates never block the ledger response.
   const today = new Date().toISOString().slice(0, 10);
   const globalRef = fs.collection("aggregates").doc("global");
   const dailyRef = fs.collection("dailyStats").doc(today);

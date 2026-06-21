@@ -7,10 +7,10 @@ interface Seed {
 }
 
 const SEEDS: Seed[] = [
-  { emoji: "✈️", label: "Flight vs train",  text: "Kolkata to Bangalore for a 3-day work trip" },
-  { emoji: "❄️", label: "AC vs cooler",     text: "Run the AC or the air cooler tonight for 8 hours" },
-  { emoji: "🚗", label: "EV vs petrol",      text: "Drive to Jaipur in my petrol car or an EV" },
-  { emoji: "🍛", label: "Mutton vs veg",     text: "Mutton curry or a veg thali for dinner" },
+  { emoji: "✈️", label: "Flight vs train", text: "Kolkata to Bangalore for a 3-day work trip" },
+  { emoji: "❄️", label: "AC vs cooler", text: "Run the AC or the air cooler tonight for 8 hours" },
+  { emoji: "🚗", label: "EV vs petrol", text: "Drive to Jaipur in my petrol car or an EV" },
+  { emoji: "🍛", label: "Mutton vs veg", text: "Mutton curry or a veg thali for dinner" },
   { emoji: "📱", label: "New phone vs keep", text: "Buy a new phone or keep my old one another year" },
 ];
 

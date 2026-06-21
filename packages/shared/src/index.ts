@@ -24,13 +24,13 @@ export interface Intent {
    * THIS, not against the worst option. Matches a candidate's `mode`.
    */
   defaultMode?: string;
-  /** Free notes — trip purpose, duration, occupancy hints. */
+  /** Free notes trip purpose, duration, occupancy hints. */
   notes?: string;
 }
 
 /**
  * A real alternative to compare. Extends the engine's pure Option with cost and
- * time, which are clearly-labeled ESTIMATES for demo routes — never scraped,
+ * time, which are clearly-labeled ESTIMATES for demo routes never scraped,
  * never the carbon number.
  */
 export interface Candidate extends Option {
@@ -97,6 +97,6 @@ export interface CompareResponse {
   nudge: string;
   /** Which front door produced this comparison. */
   source?: "text" | "voice" | "screenshot";
-  /** Present for the screenshot door — what was read from the image. */
+  /** Present for the screenshot door what was read from the image. */
   extraction?: ScreenshotExtraction;
 }

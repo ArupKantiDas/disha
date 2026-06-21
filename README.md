@@ -1,6 +1,6 @@
 # Disha
 
-**An India-specific pre-decision carbon advisor.** State a purchase or trip — or share a booking screenshot — and get your real options ranked across **carbon, cost, and time**, with a lifetime "carbon avoided" total that only grows.
+**An India-specific pre-decision carbon advisor.** State a purchase or trip or share a booking screenshot and get your real options ranked across **carbon, cost, and time**, with a lifetime "carbon avoided" total that only grows.
 
 > *Disha* (दिशा) means "direction." Every other carbon app is a guilt machine you open once. Disha makes logging a single sentence and replaces the number with one action you can take **before you spend a rupee.**
 
@@ -19,7 +19,7 @@ Built for the Carbon Footprint Awareness challenge on the Gemini + Google Cloud 
 
 ### The India honesty angle
 
-Off-the-shelf tools use Western emission factors. The Indian grid is ~**0.72 kg CO₂/kWh** (CEA) — two to three times dirtier than the EU. So electrification saves *less* here than the marketing claims. Disha says this out loud: an EV on a Jaipur drive saves ~17 kg, not "zero."
+Off-the-shelf tools use Western emission factors. The Indian grid is ~**0.72 kg CO₂/kWh** (CEA) two to three times dirtier than the EU. So electrification saves *less* here than the marketing claims. Disha says this out loud: an EV on a Jaipur drive saves ~17 kg, not "zero."
 
 ---
 
@@ -27,13 +27,13 @@ Off-the-shelf tools use Western emission factors. The Indian grid is ~**0.72 kg 
 
 ```
 disha/
-├── india-factors.json     # source of truth for all carbon math
+├── india-factors.json # source of truth for all carbon math
 ├── packages/
-│   ├── engine/            # pure computeFootprint() + factor catalog + Jest tests
-│   └── shared/            # the one contract: Intent, Candidate, RankedOption, CompareResponse
+│ ├── engine/ # pure computeFootprint() + factor catalog + Jest tests
+│ └── shared/ # the one contract: Intent, Candidate, RankedOption, CompareResponse
 └── apps/
-    ├── api/               # Express: /compare, /compare-image, /factors, /ledger/*
-    └── web/               # Next.js 14 App Router, mobile-first
+    ├── api/ # Express: /compare, /compare-image, /factors, /ledger/*
+    └── web/ # Next.js 14 App Router, mobile-first
 ```
 
 Flow: **input → Gemini parse `{intent, candidates}` → `computeFootprint` per candidate → rank by carbon → frame vs the user's default → result card.**
@@ -41,17 +41,17 @@ Flow: **input → Gemini parse `{intent, candidates}` → `computeFootprint` per
 **Stack:** Next.js 14 · Express · Gemini 2.5 Flash (`@google/genai`) · Vertex AI · Firestore · (Vercel + Cloud Run, asia-south1).
 
 ### The three front doors
-- **Type** — free text, `POST /compare`.
-- **Talk** — browser speech-to-text on the client, then the same `/compare`.
-- **Screenshot** — `POST /compare-image`; Gemini multimodal reads route/price/mode only (privacy + injection guards), the read option becomes your default, the engine supplies the greener alternatives.
+- **Type** free text, `POST /compare`.
+- **Talk** browser speech-to-text on the client, then the same `/compare`.
+- **Screenshot** `POST /compare-image`; Gemini multimodal reads route/price/mode only (privacy + injection guards), the read option becomes your default, the engine supplies the greener alternatives.
 
 ---
 
 ## Gemini backend (important)
 
-Disha talks to Gemini through **Vertex AI by default**, authenticated with Application Default Credentials — no API key in the app.
+Disha talks to Gemini through **Vertex AI by default**, authenticated with Application Default Credentials no API key in the app.
 
-Why: the Google account used for this build is restricted to `AQ.`-prefix API keys, which the Gemini Developer API rejects (`ACCESS_TOKEN_TYPE_UNSUPPORTED`). Vertex AI sidesteps this entirely and keeps everything inside the Google Cloud project. The backend is configurable — set `GEMINI_BACKEND=aistudio` with an `AIza` key if you have one.
+Why: the Google account used for this build is restricted to `AQ.`-prefix API keys, which the Gemini Developer API rejects (`ACCESS_TOKEN_TYPE_UNSUPPORTED`). Vertex AI sidesteps this entirely and keeps everything inside the Google Cloud project. The backend is configurable set `GEMINI_BACKEND=aistudio` with an `AIza` key if you have one.
 
 ---
 
@@ -65,12 +65,12 @@ npm install
 # one-time: auth for Vertex AI (Application Default Credentials)
 gcloud auth application-default login
 
-cp apps/api/.env.example apps/api/.env      # set GOOGLE_CLOUD_PROJECT
+cp apps/api/.env.example apps/api/.env # set GOOGLE_CLOUD_PROJECT
 cp apps/web/.env.local.example apps/web/.env.local
 
-# terminal 1 — API on :8080
+# terminal 1 API on :8080
 npm run dev:api
-# terminal 2 — web on :3000
+# terminal 2 web on :3000
 npm run dev:web
 ```
 
@@ -83,7 +83,7 @@ GEMINI_BACKEND=vertex
 GOOGLE_CLOUD_PROJECT=your-gcp-project-id
 GOOGLE_CLOUD_LOCATION=global
 GEMINI_MODEL=gemini-2.5-flash
-# GEMINI_API_KEY=    # only for GEMINI_BACKEND=aistudio
+# GEMINI_API_KEY= # only for GEMINI_BACKEND=aistudio
 ```
 
 ---
@@ -104,16 +104,16 @@ The engine has a guardrail test suite asserting determinism and direction-correc
 
 ## Build status
 
-- [x] **Phase 0** — skeleton, web + API talking
-- [x] **Phase 1** — emission engine + Jest tests (21)
-- [x] **Phase 2** — Gemini decision parser (strict JSON, Vertex)
-- [x] **Phase 3** — comparison endpoint + ranking
-- [x] **Phase 4** — screenshot ingestion (Door C) with privacy + injection guards
-- [x] **Phase 5** — the result card
-- [x] **Phase 6** — carbon-avoided ledger (Firestore)
-- [x] **Phase 7** — seed examples + empty state
-- [x] **Phase 8** — credibility guardrails (verified factors, guardrail tests, factor panel)
-- [x] **Phase 9** — polish + framing
-- [x] **Phase 10** — artifacts + deploy (Vercel web + Cloud Run API, live end to end)
+- [x] **Phase 0** skeleton, web + API talking
+- [x] **Phase 1** emission engine + Jest tests (21)
+- [x] **Phase 2** Gemini decision parser (strict JSON, Vertex)
+- [x] **Phase 3** comparison endpoint + ranking
+- [x] **Phase 4** screenshot ingestion (Door C) with privacy + injection guards
+- [x] **Phase 5** the result card
+- [x] **Phase 6** carbon-avoided ledger (Firestore)
+- [x] **Phase 7** seed examples + empty state
+- [x] **Phase 8** credibility guardrails (verified factors, guardrail tests, factor panel)
+- [x] **Phase 9** polish + framing
+- [x] **Phase 10** artifacts + deploy (Vercel web + Cloud Run API, live end to end)
 
 See [AGENTS.md](AGENTS.md) for the hard rules, and [docs/](docs/) for the demo script, prompt log, and LinkedIn draft.

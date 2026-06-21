@@ -3,14 +3,14 @@ import { compare } from "../compare.js";
 import type { ParseResult } from "@disha/shared";
 
 // Real seeded factors (from india-factors.json):
-//   transport.flight_domestic  : 0.246 kg/pkm
-//   transport.train_ac_electric: 0.012 kg/pkm  <- greenest of the three
-//   transport.bus_intercity    : 0.030 kg/pkm
+// transport.flight_domestic : 0.246 kg/pkm
+// transport.train_ac_electric: 0.012 kg/pkm <- greenest of the three
+// transport.bus_intercity : 0.030 kg/pkm
 //
 // At DISTANCE_KM = 500:
-//   train  ~  6 kg  (rank 1)
-//   bus    ~ 15 kg  (rank 2)
-//   flight ~ 123 kg (rank 3)
+// train ~ 6 kg (rank 1)
+// bus ~ 15 kg (rank 2)
+// flight ~ 123 kg (rank 3)
 const DISTANCE_KM = 500;
 
 function threeModeParsed(defaultMode?: string): ParseResult {
@@ -43,7 +43,7 @@ function threeModeParsed(defaultMode?: string): ParseResult {
   };
 }
 
-describe("compare – ordering and ranks", () => {
+describe("compare - ordering and ranks", () => {
   it("sorts options ascending by kgCO2e (greenest first)", () => {
     const { options } = compare(threeModeParsed());
     for (let i = 1; i < options.length; i++) {
@@ -73,7 +73,7 @@ describe("compare – ordering and ranks", () => {
   });
 });
 
-describe("compare – default mode handling", () => {
+describe("compare - default mode handling", () => {
   it("flags the default mode candidate as isDefault", () => {
     const { options } = compare(threeModeParsed("flight"));
     const def = options.find((o) => o.mode === "flight");
@@ -103,7 +103,7 @@ describe("compare – default mode handling", () => {
   });
 });
 
-describe("compare – nudge", () => {
+describe("compare - nudge", () => {
   it("nudge is a non-empty string mentioning the recommended label", () => {
     const result = compare(threeModeParsed("flight"));
     expect(typeof result.nudge).toBe("string");
@@ -126,7 +126,7 @@ describe("compare – nudge", () => {
   });
 });
 
-describe("compare – dynamic factor pass-through", () => {
+describe("compare - dynamic factor pass-through", () => {
   it("passes dynamic, factorSource, factorSourceUrl, confidence from a dynamic candidate", () => {
     const parsed: ParseResult = {
       intent: { category: "transport", summary: "cargo comparison" },

@@ -46,7 +46,7 @@ export function compare(parsed: ParseResult): CompareResponse {
     ? computed.find((c) => c.mode?.toLowerCase() === defaultMode)
     : undefined;
 
-  // 4. Build ranked options with deltas vs the default — never vs the worst.
+  // 4. Build ranked options with deltas vs the default never vs the worst.
   const options: RankedOption[] = computed.map((c, i) => ({
     ...c,
     rank: i + 1,
@@ -75,7 +75,7 @@ function buildNudge(
   defaultOption?: RankedOption,
 ): string {
   if (!defaultOption || defaultOption.mode === recommended.mode) {
-    return `You're already looking at the greenest option — ${recommended.label}.`;
+    return `You're already looking at the greenest option ${recommended.label}.`;
   }
 
   const saved = kg(defaultOption.kgCO2e - recommended.kgCO2e);

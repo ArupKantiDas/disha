@@ -28,7 +28,7 @@ type ResolvedFactor = {
  * confidence is "low".
  *
  * NOTE: responseMimeType / responseSchema must NOT be set together with the
- * googleSearch tool — Vertex rejects the combination. We instruct JSON-only in
+ * googleSearch tool Vertex rejects the combination. We instruct JSON-only in
  * the system prompt and parse leniently instead.
  */
 export async function resolveFactor(

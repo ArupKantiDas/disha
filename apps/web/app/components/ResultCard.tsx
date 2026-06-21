@@ -7,12 +7,12 @@ function round(n: number): number {
 }
 
 function formatCost(costINR?: number): string {
-  if (costINR == null) return "—";
+  if (costINR == null) return "";
   return `₹${Math.round(costINR).toLocaleString("en-IN")}`;
 }
 
 function formatDuration(hours?: number): string {
-  if (hours == null) return "—";
+  if (hours == null) return "";
   if (hours < 1) return `${Math.round(hours * 60)} min`;
   const h = Math.floor(hours);
   const m = Math.round((hours - h) * 60);
@@ -148,7 +148,7 @@ export default function ResultCard({
         {intent.summary}
       </p>
 
-      {/* Hero recommended block — bg-leafdark (#15803d) gives 5.0:1 contrast for white text (WCAG AA) */}
+      {/* Hero recommended block bg-leafdark (#15803d) gives 5.0:1 contrast for white text (WCAG AA) */}
       <div className="rounded-2xl bg-leafdark p-5 text-white shadow-md">
         <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-green-200">
           Recommended
@@ -162,7 +162,7 @@ export default function ResultCard({
         )}
       </div>
 
-      {/* India grid-honesty nuance — only when an electric option is in play */}
+      {/* India grid-honesty nuance only when an electric option is in play */}
       {usesGrid && (
         <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs leading-relaxed text-amber-800">
           <span aria-hidden="true">⚡</span> India&apos;s grid is roughly <span className="font-semibold">0.72 kg CO₂/kWh</span>{" "}

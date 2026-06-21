@@ -4,7 +4,7 @@ import { cacheKey } from "../factorCache.js";
 describe("cacheKey", () => {
   it("normalises case and whitespace", () => {
     const a = cacheKey("Leather Sofa", "kg CO2e/item");
-    const b = cacheKey("  leather sofa  ", "kg CO2e/item");
+    const b = cacheKey(" leather sofa ", "kg CO2e/item");
     expect(a).toBe(b);
   });
 

@@ -20,7 +20,7 @@ const trainCandidate = {
   distanceKm: 500,
 };
 
-describe("parseResultZod – valid input", () => {
+describe("parseResultZod - valid input", () => {
   it("accepts a minimal valid {intent, candidates[2]}", () => {
     const result = parseResultZod.safeParse({
       intent: validIntent,
@@ -67,7 +67,7 @@ describe("parseResultZod – valid input", () => {
   });
 });
 
-describe("parseResultZod – unknown factorKey", () => {
+describe("parseResultZod - unknown factorKey", () => {
   it("rejects a candidate with an unknown factorKey", () => {
     const result = parseResultZod.safeParse({
       intent: validIntent,
@@ -80,7 +80,7 @@ describe("parseResultZod – unknown factorKey", () => {
   });
 });
 
-describe("parseResultZod – dynamic.lookup refine", () => {
+describe("parseResultZod - dynamic.lookup refine", () => {
   it("rejects dynamic.lookup without lookupTerm and factorUnit", () => {
     const result = parseResultZod.safeParse({
       intent: validIntent,
@@ -129,7 +129,7 @@ describe("parseResultZod – dynamic.lookup refine", () => {
   });
 });
 
-describe("parseResultZod – minimum candidates", () => {
+describe("parseResultZod - minimum candidates", () => {
   it("rejects fewer than 2 candidates", () => {
     const result = parseResultZod.safeParse({
       intent: validIntent,

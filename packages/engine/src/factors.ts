@@ -28,7 +28,7 @@ export type FactorTable = typeof factorsJson;
 
 export const factors = factorsJson as FactorTable;
 
-/** The Indian grid carbon intensity (kg CO2e/kWh) — the load-bearing number. */
+/** The Indian grid carbon intensity (kg CO2e/kWh) the load-bearing number. */
 export function gridFactor(): number {
   return factors.grid.electricity_kwh.factor;
 }
@@ -96,7 +96,7 @@ export function factorCatalog(): Array<{
 
 /**
  * Resolve a dotted factor key (e.g. "transport.flight_domestic") to its node.
- * Throws on an unknown key — a missing factor is a bug, never a guess.
+ * Throws on an unknown key a missing factor is a bug, never a guess.
  */
 export function getFactorNode(factorKey: string): FactorNode {
   const parts = factorKey.split(".");

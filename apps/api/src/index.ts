@@ -30,7 +30,7 @@ app.use(
   }),
 );
 
-// Global limiter — covers all routes not individually limited below.
+// Global limiter covers all routes not individually limited below.
 const globalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 200,
@@ -66,12 +66,12 @@ app.get("/health", (_req, res) => {
   });
 });
 
-// The sourced factor table — powers the "how we calculate" credibility panel.
+// The sourced factor table powers the "how we calculate" credibility panel.
 app.get("/factors", (_req, res) => {
   res.json({ factors: factorCatalog() });
 });
 
-// Phase 2 — interpret only. Free text in, structured intent + candidates out.
+// Phase 2 interpret only. Free text in, structured intent + candidates out.
 app.post("/parse", geminiLimiter, async (req, res) => {
   const text = typeof req.body?.text === "string" ? req.body.text : "";
   if (!text.trim()) {
@@ -85,7 +85,7 @@ app.post("/parse", geminiLimiter, async (req, res) => {
   }
 });
 
-// Phase 3 — the core. Text -> parse -> dynamic resolution -> engine -> ranked comparison.
+// Phase 3 the core. Text -> parse -> dynamic resolution -> engine -> ranked comparison.
 app.post("/compare", geminiLimiter, async (req, res) => {
   const text = typeof req.body?.text === "string" ? req.body.text : "";
   if (!text.trim()) {
@@ -100,7 +100,7 @@ app.post("/compare", geminiLimiter, async (req, res) => {
   }
 });
 
-// Phase 4 — Door C. Screenshot in, same ranked comparison out. The read option
+// Phase 4 Door C. Screenshot in, same ranked comparison out. The read option
 // becomes the user's default; the engine supplies the greener alternatives.
 app.post("/compare-image", geminiLimiter, express.json({ limit: "10mb" }), async (req, res) => {
   const imageBase64 =
@@ -124,7 +124,7 @@ app.post("/compare-image", geminiLimiter, express.json({ limit: "10mb" }), async
   }
 });
 
-// Phase 6 — the carbon-avoided ledger. A device-scoped lifetime total that
+// Phase 6 the carbon-avoided ledger. A device-scoped lifetime total that
 // only grows. clientId is an anonymous id the browser keeps in localStorage.
 const CLIENT_ID_RE = /^[A-Za-z0-9_-]{8,128}$/;
 // Firebase UIDs are alphanumeric, typically 28 chars
