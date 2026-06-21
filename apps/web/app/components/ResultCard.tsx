@@ -104,6 +104,13 @@ export default function ResultCard({
 }) {
   const { intent, options, recommended, nudge } = data;
 
+  // The India honesty angle, surfaced at decision time: if any option draws on
+  // the grid (EV, electric appliances), say out loud that electrification
+  // saves less here because the grid is coal-heavy.
+  const usesGrid = options.some(
+    (o) => o.factorKey === "transport.car_ev" || o.factorKey.startsWith("appliances."),
+  );
+
   return (
     <div className="space-y-5">
       {/* Intent summary */}
@@ -124,6 +131,15 @@ export default function ResultCard({
           </span>
         )}
       </div>
+
+      {/* India grid-honesty nuance — only when an electric option is in play */}
+      {usesGrid && (
+        <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs leading-relaxed text-amber-800">
+          ⚡ India&apos;s grid is roughly <span className="font-semibold">0.72 kg CO₂/kWh</span>{" "}
+          (coal-heavy), so electric options save less here than Western tools
+          claim. The numbers above already account for this.
+        </div>
+      )}
 
       {/* Ranked list */}
       <div className="space-y-2.5">
