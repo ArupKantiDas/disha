@@ -6,6 +6,14 @@ vi.mock("../gemini/client.js", () => ({
   genai: vi.fn(),
 }));
 
+// resolveFactor reads/writes the Firestore-backed factor cache; stub it so the
+// test never touches Firestore (which would hang in CI with no credentials).
+vi.mock("../factorCache.js", () => ({
+  cacheKey: (lookupTerm: string, unit: string) => `${unit}:${lookupTerm}`,
+  getCachedFactor: vi.fn(async () => null),
+  putCachedFactor: vi.fn(async () => {}),
+}));
+
 import { resolveFactor } from "../gemini/resolveFactor.js";
 import { genai } from "../gemini/client.js";
 
