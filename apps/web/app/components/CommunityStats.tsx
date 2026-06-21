@@ -21,7 +21,10 @@ export default function CommunityStats() {
   }
 
   const trees = Math.round(stats.totalKgAvoided / 21);
-  const flights = Math.round(stats.totalKgAvoided / 250);
+  // km of petrol driving avoided — meaningful at every scale (unlike whole flights).
+  const kmDriving = Math.round(stats.totalKgAvoided / 0.17);
+  const plural = (n: number, one: string, many: string) =>
+    `${n.toLocaleString()} ${n === 1 ? one : many}`;
 
   // Sparkline for last 30 points
   const trend = stats.dailyTrend.slice(-30);
@@ -47,8 +50,8 @@ export default function CommunityStats() {
         </p>
         <p className="mt-0.5 text-sm font-semibold text-leaf">CO₂ avoided together</p>
         <p className="mt-1 text-xs text-slate-500">
-          {stats.totalDecisions.toLocaleString()} decisions ·{" "}
-          {stats.totalUsers.toLocaleString()} people
+          {plural(stats.totalDecisions, "decision", "decisions")} ·{" "}
+          {plural(stats.totalUsers, "person", "people")}
         </p>
       </div>
 
@@ -58,8 +61,8 @@ export default function CommunityStats() {
           <p className="text-xs text-slate-500">trees (approx)</p>
         </div>
         <div className="flex-1 rounded-xl bg-white/60 px-3 py-2 text-center">
-          <p className="text-lg font-bold text-coal">~{flights}</p>
-          <p className="text-xs text-slate-500">domestic flights (approx)</p>
+          <p className="text-lg font-bold text-coal">~{kmDriving.toLocaleString()}</p>
+          <p className="text-xs text-slate-500">km of driving (approx)</p>
         </div>
       </div>
 
