@@ -5,6 +5,7 @@ import { compare } from "./compare.js";
 import { PORT, isGeminiConfigured } from "./config.js";
 import { parseDecision } from "./gemini/parseDecision.js";
 import { compareFromScreenshot } from "./screenshotFlow.js";
+import { commitDecision, getLedger } from "./ledger.js";
 
 const app = express();
 
@@ -72,6 +73,45 @@ app.post("/compare-image", async (req, res) => {
   }
   try {
     res.json(await compareFromScreenshot(imageBase64, mimeType));
+  } catch (err) {
+    handleError(res, err);
+  }
+});
+
+// Phase 6 — the carbon-avoided ledger. A device-scoped lifetime total that
+// only grows. clientId is an anonymous id the browser keeps in localStorage.
+const CLIENT_ID_RE = /^[A-Za-z0-9_-]{8,128}$/;
+
+app.get("/ledger/:clientId", async (req, res) => {
+  const clientId = req.params.clientId;
+  if (!CLIENT_ID_RE.test(clientId)) {
+    return res.status(400).json({ error: "Invalid clientId." });
+  }
+  try {
+    res.json(await getLedger(clientId));
+  } catch (err) {
+    handleError(res, err);
+  }
+});
+
+app.post("/ledger/commit", async (req, res) => {
+  const clientId =
+    typeof req.body?.clientId === "string" ? req.body.clientId : "";
+  const kgAvoided = Number(req.body?.kgAvoided);
+  if (!CLIENT_ID_RE.test(clientId)) {
+    return res.status(400).json({ error: "Invalid or missing clientId." });
+  }
+  if (!Number.isFinite(kgAvoided)) {
+    return res.status(400).json({ error: "kgAvoided must be a number." });
+  }
+  try {
+    const state = await commitDecision(clientId, kgAvoided, {
+      label: req.body?.label,
+      factorKey: req.body?.factorKey,
+      summary: req.body?.summary,
+      defaultLabel: req.body?.defaultLabel,
+    });
+    res.json(state);
   } catch (err) {
     handleError(res, err);
   }
