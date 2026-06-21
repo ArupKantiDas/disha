@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { GEMINI_MODEL } from "../config.js";
 import { genai } from "./client.js";
+import { cacheKey, getCachedFactor, putCachedFactor } from "../factorCache.js";
 
 const SYSTEM_INSTRUCTION =
   'You retrieve ONE carbon emission factor for a specific item using Google Search. You do not compute totals. Rules: find the emission factor for the item described, expressed in the requested unit. Strongly prefer India-specific, authoritative sources (CEA, India GHG Programme, government, peer-reviewed LCA); if only global/Western data exists, use it and set confidence to "medium" (NOT "low"), noting the source region in the \'source\' field. Use confidence "high" only for India-specific authoritative sources. Use confidence "low" ONLY when no credible emission factor can be found at all. Return a single representative mid value, not a range. Output ONLY JSON, no markdown, no prose: {"perUnitFactor": number, "unit": string, "source": "publisher + year", "confidence": "high"|"medium"|"low", "basis": "one line"}. If you cannot find any credible factor, return {"perUnitFactor": null, "unit": "<requested unit>", "source": "not found", "confidence": "low", "basis": "no data"}';
@@ -34,6 +35,13 @@ export async function resolveFactor(
   lookupTerm: string,
   unit: string,
 ): Promise<ResolvedFactor | null> {
+  const key = cacheKey(lookupTerm, unit);
+  const cached = await getCachedFactor(key);
+  if (cached) {
+    console.log("[resolveFactor] cache hit:", key.slice(0, 8));
+    return cached;
+  }
+
   const ai = genai();
 
   let res: Awaited<ReturnType<typeof ai.models.generateContent>>;
@@ -95,11 +103,15 @@ export async function resolveFactor(
     (c: any) => c?.web?.uri,
   )?.web?.uri;
 
-  return {
+  const result: ResolvedFactor = {
     perUnitFactor: data.perUnitFactor,
     unit: data.unit,
     source: data.source,
     sourceUrl,
     confidence: data.confidence,
   };
+
+  void putCachedFactor(key, { ...result, lookupTerm });
+
+  return result;
 }
