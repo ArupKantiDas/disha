@@ -6,6 +6,9 @@
 
 Built for the Carbon Footprint Awareness challenge on the Gemini + Google Cloud stack.
 
+**Live demo:** https://web-three-lilac-10.vercel.app  
+**API:** https://disha-api-563892064515.asia-south1.run.app
+
 ---
 
 ## The core idea
@@ -110,7 +113,7 @@ The engine has a guardrail test suite asserting determinism and direction-correc
 - [x] **Phase 6** — carbon-avoided ledger (Firestore)
 - [x] **Phase 7** — seed examples + empty state
 - [x] **Phase 8** — credibility guardrails (verified factors, guardrail tests, factor panel)
-- [ ] **Phase 9** — polish + framing
-- [ ] **Phase 10** — artifacts + deploy
+- [x] **Phase 9** — polish + framing
+- [x] **Phase 10** — artifacts + deploy (Vercel web + Cloud Run API, live end to end)
 
 See [AGENTS.md](AGENTS.md) for the hard rules, and [docs/](docs/) for the demo script, prompt log, and LinkedIn draft.
