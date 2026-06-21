@@ -1,12 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import DecisionInput from "./components/DecisionInput";
 import ResultCard from "./components/ResultCard";
 import SeedChips from "./components/SeedChips";
 import ScreenshotUpload from "./components/ScreenshotUpload";
-import { compare, compareImage } from "./lib/api";
-import type { CompareResponse } from "./lib/types";
+import AvoidedCounter from "./components/AvoidedCounter";
+import HowWeCalculate from "./components/HowWeCalculate";
+import { compare, compareImage, getLedger, commitDecision } from "./lib/api";
+import { getClientId } from "./lib/clientId";
+import type { CompareResponse, LedgerState, RankedOption } from "./lib/types";
 
 type PageState =
   | { kind: "idle" }
@@ -16,6 +19,25 @@ type PageState =
 
 export default function Home() {
   const [state, setState] = useState<PageState>({ kind: "idle" });
+  const [ledger, setLedger] = useState<LedgerState>({ kgAvoidedTotal: 0, decisionCount: 0 });
+  const [toast, setToast] = useState<string | null>(null);
+  const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const clientIdRef = useRef<string>("");
+
+  useEffect(() => {
+    const id = getClientId();
+    clientIdRef.current = id;
+    if (!id) return;
+    getLedger(id)
+      .then(setLedger)
+      .catch(() => {/* keep zeros */});
+  }, []);
+
+  function showToast(msg: string) {
+    if (toastTimer.current) clearTimeout(toastTimer.current);
+    setToast(msg);
+    toastTimer.current = setTimeout(() => setToast(null), 3000);
+  }
 
   async function handleSubmit(text: string) {
     setState({ kind: "loading" });
@@ -49,9 +71,29 @@ export default function Home() {
     }
   }
 
+  async function handleTake(option: RankedOption) {
+    const clientId = clientIdRef.current;
+    if (!clientId) return;
+    const result = state.kind === "result" ? state.data : null;
+    try {
+      const updated = await commitDecision({
+        clientId,
+        kgAvoided: option.kgVsDefault ?? 0,
+        label: option.label,
+        defaultLabel: result?.default?.label,
+        summary: result?.intent.summary,
+        factorKey: option.factorKey,
+      });
+      setLedger(updated);
+      showToast("Logged ✓");
+    } catch {
+      showToast("Could not log — try again.");
+    }
+  }
+
   return (
     <main className="mx-auto max-w-md px-4 py-10">
-      <header className="mb-8 space-y-2">
+      <header className="mb-6 space-y-2">
         <h1 className="text-3xl font-bold tracking-tight text-coal">
           Disha <span className="text-leaf">·</span>
         </h1>
@@ -63,6 +105,13 @@ export default function Home() {
           spend a rupee.
         </p>
       </header>
+
+      <div className="mb-6">
+        <AvoidedCounter
+          kgAvoidedTotal={ledger.kgAvoidedTotal}
+          decisionCount={ledger.decisionCount}
+        />
+      </div>
 
       <DecisionInput
         onSubmit={handleSubmit}
@@ -114,15 +163,25 @@ export default function Home() {
                 )}
               </div>
             )}
-            <ResultCard data={state.data} />
+            <ResultCard data={state.data} onTake={handleTake} />
           </>
         )}
+      </div>
+
+      <div className="mt-10">
+        <HowWeCalculate />
       </div>
 
       <footer className="mt-12 border-t border-slate-100 pt-6 text-xs text-slate-400">
         Gemini interprets. The engine computes. Carbon math from verified CEA &amp;
         rail factors — never guessed.
       </footer>
+
+      {toast && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 rounded-full bg-coal px-4 py-2 text-sm font-semibold text-white shadow-lg transition-opacity">
+          {toast}
+        </div>
+      )}
     </main>
   );
 }

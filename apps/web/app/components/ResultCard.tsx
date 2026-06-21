@@ -19,7 +19,13 @@ function formatDuration(hours?: number): string {
   return m > 0 ? `${h}h ${m}m` : `${h}h`;
 }
 
-function OptionCard({ option }: { option: RankedOption }) {
+function OptionCard({
+  option,
+  onTake,
+}: {
+  option: RankedOption;
+  onTake?: (option: RankedOption) => void;
+}) {
   return (
     <div
       className={`rounded-xl bg-white p-4 shadow-sm ${
@@ -74,11 +80,28 @@ function OptionCard({ option }: { option: RankedOption }) {
           </p>
         </div>
       </div>
+
+      {onTake && (
+        <div className="mt-3 flex justify-end">
+          <button
+            onClick={() => onTake(option)}
+            className="rounded-full border border-leaf px-3 py-1 text-xs font-semibold text-leaf hover:bg-leaf/10 active:bg-leaf/20 transition-colors"
+          >
+            I&apos;ll take this →
+          </button>
+        </div>
+      )}
     </div>
   );
 }
 
-export default function ResultCard({ data }: { data: CompareResponse }) {
+export default function ResultCard({
+  data,
+  onTake,
+}: {
+  data: CompareResponse;
+  onTake?: (option: RankedOption) => void;
+}) {
   const { intent, options, recommended, nudge } = data;
 
   return (
@@ -108,7 +131,11 @@ export default function ResultCard({ data }: { data: CompareResponse }) {
           All options · greenest first
         </p>
         {options.map((option) => (
-          <OptionCard key={`${option.factorKey}-${option.rank}`} option={option} />
+          <OptionCard
+            key={`${option.factorKey}-${option.rank}`}
+            option={option}
+            onTake={onTake}
+          />
         ))}
       </div>
     </div>

@@ -47,3 +47,19 @@ export interface CompareResponse {
   source?: "text" | "voice" | "screenshot";
   extraction?: ScreenshotExtraction;
 }
+
+export interface LedgerState {
+  kgAvoidedTotal: number;
+  decisionCount: number;
+}
+
+export interface FactorRow {
+  key: string;
+  label: string;
+  perUnitFactor: number | null;
+  unit: string;
+  source?: string;
+  note?: string;
+  verifiedAgainst?: string;
+  verify?: boolean;
+}
