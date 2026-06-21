@@ -20,6 +20,7 @@ export interface FactorNode {
   note?: string;
   honesty_note?: string;
   source?: string;
+  verified_against?: string;
   verify?: boolean;
 }
 
@@ -67,6 +68,7 @@ export function factorCatalog(): Array<{
   unit: string;
   source?: string;
   note?: string;
+  verifiedAgainst?: string;
   verify?: boolean;
 }> {
   return listFactorKeys().map((key) => {
@@ -86,6 +88,7 @@ export function factorCatalog(): Array<{
       unit: node.unit ?? "(grid-derived)",
       source: node.source,
       note: node.note ?? node.honesty_note,
+      verifiedAgainst: node.verified_against,
       verify: node.verify,
     };
   });

@@ -18,9 +18,10 @@
       "label": "Indian grid electricity",
       "factor": 0.72,
       "unit": "kg_co2e_per_kwh",
-      "source": "CEA CO2 Baseline Database: 0.716 tCO2/MWh (FY2022-23), 0.727 RE-adjusted weighted average (latest update)",
+      "source": "CEA CO2 Baseline Database for the Indian Power Sector, User Guide v20 (Dec 2024): 0.727 tCO2/MWh RE-adjusted weighted average (FY2023-24), 0.716 (FY2022-23). Our 0.72 sits within this range.",
       "honesty_note": "This is the single most important number in the product. The Indian grid is roughly two to three times dirtier than the EU grid, which is why electrification (EV, induction) saves far less here than Western tools claim. Surface this nuance, do not hide it.",
-      "verify": true
+      "verified_against": "CEA CO2 Baseline Database v20, Dec 2024",
+      "verify": false
     }
   },
 
@@ -30,16 +31,18 @@
       "factor": 0.246,
       "unit": "kg_co2e_per_pkm",
       "note": "Short domestic legs are carbon-intensive per km because takeoff dominates. Do not apply long-haul efficiencies to a Kolkata to Bangalore hop.",
-      "source": "Our World in Data: domestic flight approx 246 g CO2 per passenger km",
-      "verify": true
+      "source": "Our World in Data (UK DESNZ/DEFRA-derived): domestic flight approx 246 g CO2 per passenger km. DEFRA 2024 domestic factor is in the same 0.24-0.25 range.",
+      "verified_against": "Our World in Data travel-carbon-footprint; DEFRA 2024",
+      "verify": false
     },
     "train_ac_electric": {
       "label": "Train, AC class, electric / mixed traction",
       "factor": 0.012,
       "unit": "kg_co2e_per_pkm",
       "note": "Indian Railways is partly electric, partly diesel. Conservative blended estimate. Sleeper / general class is lower per passenger than AC due to higher occupancy.",
-      "source": "India GHG Programme rail factors; international electric rail 0.004 to 0.015 range",
-      "verify": true
+      "source": "India GHG Programme rail factors (all-class avg approx 0.0078 kg/pkm, 2014-15). AC class runs higher per passenger than the average, so 0.012 is a conservative AC estimate that does not over-claim rail's advantage. International electric rail spans 0.004-0.015.",
+      "verified_against": "India GHG Programme rail transport EF",
+      "verify": false
     },
     "bus_intercity": {
       "label": "Intercity bus / coach",
