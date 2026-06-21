@@ -1,0 +1,131 @@
+{
+  "meta": {
+    "name": "Lever India emission factors (seed)",
+    "version": "0.1.0-seed",
+    "purpose": "Deterministic source of truth for carbon math. Gemini interprets user input into structured options; this table computes the numbers. The model never invents a factor.",
+    "units_note": "Transport factors are kg CO2e per passenger-kilometre (pkm) unless marked per_vehicle_km. Energy is kg CO2e per kWh. Diet is kg CO2e per meal-portion. Goods are kg CO2e embodied per unit.",
+    "credibility_warning": "These are defensible SEED values, not final. Every factor flagged verify:true must be checked against the primary source before submission. A single wrong factor undermines the whole tool's claim of being engine-computed rather than guessed. Treat this file as the thing you defend to judges.",
+    "primary_sources": {
+      "grid": "Central Electricity Authority (CEA), CO2 Baseline Database for the Indian Power Sector, User Guide v19 to v21",
+      "transport_intl_reference": "Our World in Data, travel carbon footprint; ICCT commercial aviation CO2",
+      "rail_india": "India GHG Programme, India-specific rail transport emission factors",
+      "goods": "Generic LCA literature for embodied manufacturing carbon"
+    }
+  },
+
+  "grid": {
+    "electricity_kwh": {
+      "label": "Indian grid electricity",
+      "factor": 0.72,
+      "unit": "kg_co2e_per_kwh",
+      "source": "CEA CO2 Baseline Database: 0.716 tCO2/MWh (FY2022-23), 0.727 RE-adjusted weighted average (latest update)",
+      "honesty_note": "This is the single most important number in the product. The Indian grid is roughly two to three times dirtier than the EU grid, which is why electrification (EV, induction) saves far less here than Western tools claim. Surface this nuance, do not hide it.",
+      "verify": true
+    }
+  },
+
+  "transport": {
+    "flight_domestic": {
+      "label": "Domestic flight, economy",
+      "factor": 0.246,
+      "unit": "kg_co2e_per_pkm",
+      "note": "Short domestic legs are carbon-intensive per km because takeoff dominates. Do not apply long-haul efficiencies to a Kolkata to Bangalore hop.",
+      "source": "Our World in Data: domestic flight approx 246 g CO2 per passenger km",
+      "verify": true
+    },
+    "train_ac_electric": {
+      "label": "Train, AC class, electric / mixed traction",
+      "factor": 0.012,
+      "unit": "kg_co2e_per_pkm",
+      "note": "Indian Railways is partly electric, partly diesel. Conservative blended estimate. Sleeper / general class is lower per passenger than AC due to higher occupancy.",
+      "source": "India GHG Programme rail factors; international electric rail 0.004 to 0.015 range",
+      "verify": true
+    },
+    "bus_intercity": {
+      "label": "Intercity bus / coach",
+      "factor": 0.03,
+      "unit": "kg_co2e_per_pkm",
+      "verify": true
+    },
+    "car_petrol": {
+      "label": "Petrol car",
+      "factor": 0.17,
+      "unit": "kg_co2e_per_vehicle_km",
+      "occupancy_default": 1.5,
+      "note": "Divide by occupancy for per-passenger comparison. A solo driver carries the full 0.17 per km.",
+      "source": "Our World in Data: average petrol car approx 170 g CO2 per km",
+      "verify": true
+    },
+    "car_ev": {
+      "label": "Electric car (India grid charged)",
+      "computed": "energy_kwh_per_km * grid.electricity_kwh.factor",
+      "energy_kwh_per_km": 0.15,
+      "unit": "kg_co2e_per_vehicle_km",
+      "occupancy_default": 1.5,
+      "honesty_note": "Approx 0.108 kg/km on today's Indian grid, NOT zero. This is the headline honesty moment: an EV in India is cleaner than petrol but the gap is smaller than the marketing suggests, because the grid is coal-heavy.",
+      "verify": true
+    },
+    "two_wheeler_petrol": {
+      "label": "Petrol two-wheeler",
+      "factor": 0.05,
+      "unit": "kg_co2e_per_vehicle_km",
+      "verify": true
+    },
+    "auto_rickshaw_cng": {
+      "label": "CNG auto-rickshaw",
+      "factor": 0.07,
+      "unit": "kg_co2e_per_vehicle_km",
+      "occupancy_default": 1.5,
+      "verify": true
+    }
+  },
+
+  "appliances": {
+    "ac_window_1ton": {
+      "label": "Window AC, 1 ton, per hour",
+      "energy_kwh_per_hour": 1.0,
+      "computed": "energy_kwh_per_hour * grid.electricity_kwh.factor",
+      "unit": "kg_co2e_per_hour",
+      "verify": true
+    },
+    "air_cooler": {
+      "label": "Evaporative air cooler, per hour",
+      "energy_kwh_per_hour": 0.15,
+      "computed": "energy_kwh_per_hour * grid.electricity_kwh.factor",
+      "unit": "kg_co2e_per_hour",
+      "verify": true
+    }
+  },
+
+  "diet": {
+    "veg_thali": {
+      "label": "Vegetarian thali (per meal)",
+      "factor": 0.7,
+      "unit": "kg_co2e_per_meal",
+      "verify": true
+    },
+    "chicken_meal": {
+      "label": "Chicken meal (per meal)",
+      "factor": 1.6,
+      "unit": "kg_co2e_per_meal",
+      "verify": true
+    },
+    "mutton_meal": {
+      "label": "Mutton / red meat meal (per meal)",
+      "factor": 5.5,
+      "unit": "kg_co2e_per_meal",
+      "note": "Ruminant red meat is the highest-leverage dietary swap by a wide margin.",
+      "verify": true
+    }
+  },
+
+  "goods": {
+    "smartphone_new": {
+      "label": "New smartphone (embodied manufacturing carbon)",
+      "factor": 70,
+      "unit": "kg_co2e_per_unit",
+      "note": "Most of a phone's lifetime carbon is in manufacture, not use. Keeping a working phone one extra year avoids the full embodied cost of a replacement. Good archetype for the 'keep vs upgrade' decision.",
+      "verify": true
+    }
+  }
+}

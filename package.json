@@ -1,0 +1,20 @@
+{
+  "name": "disha",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Disha — an India-specific pre-decision carbon advisor. State a trip or purchase, get your real options ranked across carbon, cost, and time.",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "dev:api": "npm run dev --workspace apps/api",
+    "dev:web": "npm run dev --workspace apps/web",
+    "dev": "npm run dev:api & npm run dev:web",
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
