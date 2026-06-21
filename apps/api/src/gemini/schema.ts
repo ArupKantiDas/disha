@@ -47,6 +47,9 @@ const candidateZod = z
       return true;
     },
     {
+      // Forces a re-ask when a dynamic candidate omits its lookup fields, which
+      // reliably fills them on the retry. resolveDynamicFactors still drops any
+      // stray incomplete candidate as a backstop.
       message:
         "When factorKey is 'dynamic.lookup', lookupTerm and factorUnit are required",
     },

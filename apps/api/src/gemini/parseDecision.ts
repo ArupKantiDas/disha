@@ -51,8 +51,9 @@ DYNAMIC LOOKUP — for items not in the seeded factor table:
     factorUnit: the unit family that fits this item (one of: kg_co2e_per_unit, kg_co2e_per_pkm, kg_co2e_per_vehicle_km, kg_co2e_per_hour, kg_co2e_per_meal, kg_co2e_per_kwh).
     Plus the matching quantity field (units, distanceKm, hours, meals, or kwh).
 - When two options differ only in material or brand (leather vs fabric sofa, bamboo vs plastic desk), they can SHARE the same lookupTerm for the general product category — the carbon difference between material variants is usually small and the same broad LCA factor is a reasonable approximation.
-- ALWAYS prefer a real seeded key when one fits. Only use dynamic.lookup for genuinely unlisted items (e.g. furniture, non-standard foods, unlisted goods).
-- Do NOT use dynamic.lookup for any transport, standard diet, or standard appliance key that already exists in the table.
+- ALWAYS prefer a real seeded key when one fits. Only use dynamic.lookup for genuinely unlisted items (e.g. furniture, specific foods/drinks, unlisted goods).
+- Do NOT use dynamic.lookup for transport or standard appliance keys that already exist in the table.
+- Diet: use the seeded meal keys (veg_thali, chicken_meal, mutton_meal) for a generic meal, but for a SPECIFIC food or drink that is not a plain veg/chicken/mutton meal (e.g. paneer, tofu, almond milk, dairy milk, cheese), use dynamic.lookup with factorUnit kg_co2e_per_unit or kg_co2e_per_meal — never force two different foods onto the same seeded meal key.
 
 Output ONLY JSON conforming to the provided schema. No prose, no markdown.`;
 
@@ -66,22 +67,48 @@ User decision:
 Return the intent and candidate set as JSON.`;
 }
 
-async function callGemini(userText: string, repair?: string): Promise<string> {
+// Some inputs make the model stall on structured output at temperature 0. Cap
+// output and time-box the call so the API never hangs; the retry nudges the
+// temperature off 0 to break a degenerate generation.
+const PARSE_TIMEOUT_MS = 30000;
+const PARSE_MAX_TOKENS = 8192;
+
+function withTimeout<T>(p: Promise<T>, ms: number, label: string): Promise<T> {
+  return Promise.race([
+    p,
+    new Promise<T>((_, reject) =>
+      setTimeout(() => reject(new Error(`${label} timed out after ${ms}ms`)), ms),
+    ),
+  ]);
+}
+
+async function callGemini(
+  userText: string,
+  repair: string | undefined,
+  temperature: number,
+): Promise<string> {
   const ai = genai();
   const prompt = repair
     ? `${buildPrompt(userText)}\n\nYour previous reply was rejected: ${repair}\nReturn ONLY valid JSON matching the schema.`
     : buildPrompt(userText);
 
-  const res = await ai.models.generateContent({
-    model: GEMINI_MODEL,
-    contents: prompt,
-    config: {
-      systemInstruction: SYSTEM_INSTRUCTION,
-      responseMimeType: "application/json",
-      responseSchema: geminiParseSchema,
-      temperature: 0,
-    },
-  });
+  const res = await withTimeout(
+    ai.models.generateContent({
+      model: GEMINI_MODEL,
+      contents: prompt,
+      config: {
+        systemInstruction: SYSTEM_INSTRUCTION,
+        responseMimeType: "application/json",
+        // The strict schema keeps the structure clean (no nulls); the token cap
+        // + timeout + retry stop it from stalling on rare inputs.
+        responseSchema: geminiParseSchema,
+        temperature,
+        maxOutputTokens: PARSE_MAX_TOKENS,
+      },
+    }),
+    PARSE_TIMEOUT_MS,
+    "Gemini parse",
+  );
 
   const text = res.text;
   if (!text) throw new Error("Gemini returned an empty response");
@@ -99,7 +126,19 @@ export async function parseDecision(userText: string): Promise<ParseResult> {
 
   let lastError = "";
   for (let attempt = 0; attempt < 2; attempt++) {
-    const raw = await callGemini(clean, attempt === 0 ? undefined : lastError);
+    let raw: string;
+    try {
+      // First pass deterministic (temp 0); retry nudges temperature to break a
+      // stalled generation and survives a timeout instead of hanging.
+      raw = await callGemini(
+        clean,
+        attempt === 0 ? undefined : lastError,
+        attempt === 0 ? 0 : 0.4,
+      );
+    } catch (err) {
+      lastError = err instanceof Error ? err.message : "Gemini call failed";
+      continue;
+    }
     let json: unknown;
     try {
       json = JSON.parse(raw);
